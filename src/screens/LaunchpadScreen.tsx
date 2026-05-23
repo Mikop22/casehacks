@@ -6,7 +6,13 @@ import { colors, fonts, radius, shadow, space } from '../theme';
 
 const APP_BACKDROP = require('../../assets/reference/scotia-app-bg.jpg');
 
-export function LaunchpadScreen({ onStart }: { onStart?: () => void }) {
+export function LaunchpadScreen({
+  onStart,
+  onLearnMore,
+}: {
+  onStart?: () => void;
+  onLearnMore?: () => void;
+}) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -45,7 +51,7 @@ export function LaunchpadScreen({ onStart }: { onStart?: () => void }) {
           <Text style={styles.ctaText}>Start my Launchpad</Text>
         </Pressable>
 
-        <Pressable onPress={onStart} style={styles.link} accessibilityRole="link">
+        <Pressable onPress={onLearnMore} style={styles.link} accessibilityRole="link">
           <Text style={styles.linkText}>See how the $500 bonus works</Text>
         </Pressable>
       </View>
