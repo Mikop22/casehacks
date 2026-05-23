@@ -20,3 +20,16 @@ This is not an official Scotiabank brand guide. It is a practical, public-site-d
 For software, use `scotia-tokens.css` as the base layer, keep the UI mostly white/light gray, reserve Scotia red for primary actions and key status, and avoid decorative gradients.
 
 For slides, use a white canvas, red section markers, black/charcoal headlines, measured gray text, full-bleed public imagery only where it clarifies the story, and one point per slide.
+
+## React Native App
+
+This repo now includes an Expo React Native starter app.
+
+```bash
+npm install
+npm run ios
+npm run android
+npm run web
+```
+
+The app entry point is `App.tsx`.
