@@ -68,19 +68,6 @@ export function ActivateScreen({
               We'll deposit {pct}% of each paycheque into your selected Scotia{' '}iTRADE account.
             </Text>
 
-            {/* Plan summary */}
-            <View style={styles.summary}>
-              <Text style={styles.summaryEyebrow}>YOUR LAUNCHPAD PLAN</Text>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryKey}>Per paycheque</Text>
-                <Text style={styles.summaryVal}>{pct}% · {money(deposit)}</Text>
-              </View>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryKey}>After 3 months</Text>
-                <Text style={styles.summaryVal}>{money(threeMonths)}</Text>
-              </View>
-            </View>
-
             {/* Account picker */}
             <Text style={styles.sectionLabel}>Deposit into</Text>
             <View style={styles.accountList}>
@@ -234,37 +221,6 @@ const styles = StyleSheet.create({
     color: colors.gray600,
     textAlign: 'center',
     paddingHorizontal: 12,
-  },
-
-  // ── Plan summary ──
-  summary: {
-    marginTop: 16,
-    backgroundColor: colors.surface,
-    borderRadius: radius.sm,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    gap: 6,
-  },
-  summaryEyebrow: {
-    fontFamily: fonts.semibold,
-    fontSize: 10,
-    letterSpacing: 1.4,
-    color: colors.gray500,
-    marginBottom: 4,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  summaryKey: {
-    fontFamily: fonts.regular,
-    fontSize: 13,
-    color: colors.gray600,
-  },
-  summaryVal: {
-    fontFamily: fonts.semibold,
-    fontSize: 13,
-    color: colors.inkStrong,
   },
 
   // ── Account picker ──
