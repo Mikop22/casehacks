@@ -41,7 +41,10 @@ export function ActivateScreen({
         <View style={{ height: insets.top + 30 }} />
 
         <View style={styles.sheet}>
-          {/* Handle row with back button */}
+          {/* Handle pill */}
+          <View style={styles.handle} />
+
+          {/* Back button */}
           <View style={styles.topBar}>
             <Pressable
               onPress={onBack}
@@ -53,9 +56,6 @@ export function ActivateScreen({
               <Text style={styles.backArrow}>‹</Text>
               <Text style={styles.backLabel}>Back</Text>
             </Pressable>
-            <View style={styles.handle} />
-            {/* Spacer to balance back button */}
-            <View style={styles.backSpacer} />
           </View>
 
           <ScrollView
@@ -178,6 +178,14 @@ const styles = StyleSheet.create({
   },
 
   // ── Top bar ──
+  handle: {
+    alignSelf: 'center',
+    width: 40,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: colors.gray300,
+    marginBottom: 4,
+  },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -199,16 +207,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: fonts.medium,
     color: colors.linkBlue,
-  },
-  handle: {
-    flex: 1,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: colors.gray300,
-    marginHorizontal: 12,
-  },
-  backSpacer: {
-    width: 52, // approximate width of back button
   },
 
   // ── Scroll ──
