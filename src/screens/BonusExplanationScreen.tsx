@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
 
   // Table
   tableCard: {
-    borderRadius: radius.md,
+    borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: colors.border,
     overflow: 'hidden',
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
   tdBonus: { fontFamily: fonts.semibold, color: colors.inkStrong, textAlign: 'right' },
   // FAQ
   faqCard: {
-    borderRadius: radius.md,
+    borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: colors.border,
     overflow: 'hidden',

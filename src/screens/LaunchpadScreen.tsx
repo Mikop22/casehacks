@@ -1,9 +1,9 @@
+import * as Haptics from 'expo-haptics';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts, radius, shadow, space } from '../theme';
 
-const APP_BACKDROP = require('../../assets/reference/scotia-app-bg.jpg');
+const ITRADE_LOGO = require('../../assets/scotiabank-public/scotia-itrade-logo.png');
 
 export function LaunchpadScreen({
   onStart,
@@ -16,26 +16,12 @@ export function LaunchpadScreen({
 
   return (
     <View style={styles.root}>
-      {/* ── Blurred app backdrop ── */}
-      <Image source={APP_BACKDROP} style={styles.backdrop} resizeMode="cover" />
-      <BlurView intensity={40} tint="light" style={StyleSheet.absoluteFill} />
-      <View style={styles.scrim} pointerEvents="none" />
-
       {/* ── Main content sheet ── */}
       <View style={[styles.sheet, { paddingBottom: insets.bottom + space.sm }]}>
         <View style={styles.handle} />
 
-        {/* Product heading — not the full Scotiabank wordmark */}
-        <Text style={styles.productName}>Launchpad</Text>
-        <Text style={styles.eyebrow}>by Scotia iTRADE</Text>
-
-        {/* Referral context — reframed as a Scotia-native pattern */}
-        <View style={styles.referralRow}>
-          <View style={styles.referralDot} />
-          <Text style={styles.referralText}>
-            Referred by Mikhai · Preferred Package member
-          </Text>
-        </View>
+        <Image source={ITRADE_LOGO} style={styles.logo} resizeMode="contain" />
+        <Text style={styles.eyebrow}>Powered by Scotiabank</Text>
 
         <Text style={styles.title}>Start your investing habit</Text>
 
@@ -51,16 +37,16 @@ export function LaunchpadScreen({
         </View>
 
         <Pressable
-          onPress={onStart}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onStart?.(); }}
           style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
           accessibilityRole="button"
-          accessibilityLabel="Start my Launchpad"
+          accessibilityLabel="Get started"
         >
-          <Text style={styles.ctaText}>Start my Launchpad</Text>
+          <Text style={styles.ctaText}>Get started</Text>
         </Pressable>
 
         <Pressable
-          onPress={onLearnMore}
+          onPress={() => { Haptics.selectionAsync(); onLearnMore?.(); }}
           style={styles.link}
           accessibilityRole="link"
           accessibilityLabel="See how the 500 dollar bonus works"
@@ -77,25 +63,7 @@ export function LaunchpadScreen({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: colors.canvas,
     justifyContent: 'flex-end',
-  },
-  backdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: '100%',
-    height: '100%',
-  },
-  scrim: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(26,25,25,0.12)',
   },
 
   // ── Sheet ──
@@ -117,40 +85,16 @@ const styles = StyleSheet.create({
   },
 
   // ── Product identity ──
-  productName: {
-    fontFamily: fonts.bold,
-    fontSize: 22,
-    color: colors.inkStrong,
-    letterSpacing: -0.3,
+  logo: {
+    height: 24,
+    width: 160,
+    marginTop: 4,
   },
   eyebrow: {
-    marginTop: 2,
+    marginTop: 8,
     fontFamily: fonts.medium,
-    fontSize: 12,
+    fontSize: 10,
     color: colors.gray500,
-  },
-
-  // ── Referral row (Scotia-native pattern, not a social chip) ──
-  referralRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: space.sm,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    backgroundColor: colors.surface,
-    borderRadius: radius.sm,
-  },
-  referralDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.red,
-  },
-  referralText: {
-    fontFamily: fonts.regular,
-    fontSize: 13,
-    color: colors.ink,
   },
 
   // ── Title ──
@@ -193,7 +137,7 @@ const styles = StyleSheet.create({
   cta: {
     alignSelf: 'stretch',
     height: 52,
-    borderRadius: radius.pill,
+    borderRadius: radius.sm,
     backgroundColor: colors.red,
     alignItems: 'center',
     justifyContent: 'center',
@@ -216,7 +160,7 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontFamily: fonts.semibold,
-    fontSize: 13,
+    fontSize: 10,
     color: colors.linkBlue,
   },
 });

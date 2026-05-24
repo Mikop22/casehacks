@@ -30,6 +30,10 @@ export const colors = {
   // Soft red wash for badges / accents on white
   redWash: '#FDECEC',
   redWashBorder: '#F7C9CB',
+
+  // Scotia confirmation green
+  green: '#00855A',
+  greenWash: '#E6F4EF',
 } as const;
 
 // Source Sans 3 is the closest free match to Frutiger, Scotiabank's licensed brand typeface.
@@ -54,10 +58,10 @@ export const space = {
 // Scotia uses tight, utilitarian radii — 4–6px on cards, 5px rect buttons.
 // Pill (999) only for marketing CTAs.
 export const radius = {
-  sm: 4,
-  md: 8,
-  lg: 12,
-  card: 12,
+  sm: 10,
+  md: 14,
+  lg: 20,
+  card: 14,
   pill: 999,
 } as const;
 

@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from 'react';
-import { Animated, Dimensions, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Easing, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -15,21 +15,29 @@ import { LaunchpadScreen } from './src/screens/LaunchpadScreen';
 import { CommitScreen } from './src/screens/CommitScreen';
 import { BonusExplanationScreen } from './src/screens/BonusExplanationScreen';
 import { ActivateScreen } from './src/screens/ActivateScreen';
+import { NoTradeScreen } from './src/screens/NoTradeScreen';
+import { ThankYouScreen } from './src/screens/ThankYouScreen';
 
-type Screen = 'launchpad' | 'commit' | 'bonus' | 'activate';
+type Screen = 'launchpad' | 'commit' | 'bonus' | 'activate' | 'no-trade' | 'thankyou';
 
 const SCREEN_H = Dimensions.get('window').height;
-const EXIT_MS = 280;
+
+// How far the outgoing sheet drops (subtle — just enough to feel dismissed)
+const OUT_Y = SCREEN_H * 0.10;
+// How far the incoming sheet rises from below
+const IN_Y = SCREEN_H * 0.18;
 
 export default function App() {
   const [current, setCurrent] = useState<Screen>('launchpad');
   const [next, setNext] = useState<Screen | null>(null);
   const [commitPct, setCommitPct] = useState(5);
 
-  // Outgoing sheet: 1 → 0 (slide down + fade)
   const outAnim = useRef(new Animated.Value(1)).current;
-  // Incoming sheet: 0 → 1 (slide up + fade in)
-  const inAnim = useRef(new Animated.Value(1)).current;
+  const inAnim  = useRef(new Animated.Value(1)).current;
+
+  // First-load entrance
+  const entranceAnim = useRef(new Animated.Value(0)).current;
+  const hasEntered   = useRef(false);
 
   const transitioning = useRef(false);
 
@@ -41,6 +49,19 @@ export default function App() {
     SourceSans3_800ExtraBold,
   });
 
+  // Spring the first screen in once fonts are ready
+  useEffect(() => {
+    if (!fontsLoaded || hasEntered.current) return;
+    hasEntered.current = true;
+    Animated.spring(entranceAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      damping: 22,
+      stiffness: 180,
+      mass: 1,
+    }).start();
+  }, [fontsLoaded]);
+
   const navigate = useCallback(
     (to: Screen) => {
       if (transitioning.current || to === current) return;
@@ -50,21 +71,27 @@ export default function App() {
       outAnim.setValue(1);
       inAnim.setValue(0);
 
-      Animated.sequence([
-        // Phase 1: outgoing sheet slides down + fades
+      // Exit and entrance run in parallel — exit is fast, entrance springs in
+      // slightly behind so the old sheet clears before the new one peaks.
+      Animated.parallel([
+        // Outgoing: quick ease-in fade + small drop
         Animated.timing(outAnim, {
           toValue: 0,
-          duration: EXIT_MS,
+          duration: 190,
+          easing: Easing.in(Easing.quad),
           useNativeDriver: true,
         }),
-        // Phase 2: incoming sheet springs up naturally
-        Animated.spring(inAnim, {
-          toValue: 1,
-          useNativeDriver: true,
-          damping: 18,
-          stiffness: 90,
-          mass: 1,
-        }),
+        // Incoming: delayed spring — starts just as outgoing fades
+        Animated.sequence([
+          Animated.delay(70),
+          Animated.spring(inAnim, {
+            toValue: 1,
+            useNativeDriver: true,
+            damping: 24,
+            stiffness: 280,
+            mass: 1,
+          }),
+        ]),
       ]).start(() => {
         setCurrent(to);
         setNext(null);
@@ -76,32 +103,36 @@ export default function App() {
     [current, outAnim, inAnim],
   );
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  if (!fontsLoaded) return null;
+
+  const entranceStyle = {
+    opacity: entranceAnim,
+    transform: [{
+      translateY: entranceAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [IN_Y, 0],
+      }),
+    }],
+  };
 
   const outStyle = {
     opacity: outAnim,
-    transform: [
-      {
-        translateY: outAnim.interpolate({
-          inputRange: [0, 1],
-          outputRange: [SCREEN_H * 0.18, 0],
-        }),
-      },
-    ],
+    transform: [{
+      translateY: outAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [OUT_Y, 0],
+      }),
+    }],
   };
 
   const inStyle = {
     opacity: inAnim,
-    transform: [
-      {
-        translateY: inAnim.interpolate({
-          inputRange: [0, 1],
-          outputRange: [SCREEN_H * 0.22, 0],
-        }),
-      },
-    ],
+    transform: [{
+      translateY: inAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [IN_Y, 0],
+      }),
+    }],
   };
 
   const renderScreen = (screen: Screen) => {
@@ -130,6 +161,22 @@ export default function App() {
             pct={commitPct}
             onBack={() => navigate('commit')}
             onActivate={() => navigate('launchpad')}
+            onNoTrade={() => navigate('no-trade')}
+          />
+        );
+      case 'no-trade':
+        return (
+          <NoTradeScreen
+            pct={commitPct}
+            onBack={() => navigate('activate')}
+            onDownload={() => navigate('thankyou')}
+          />
+        );
+      case 'thankyou':
+        return (
+          <ThankYouScreen
+            pct={commitPct}
+            onDone={() => navigate('launchpad')}
           />
         );
     }
@@ -151,9 +198,9 @@ export default function App() {
         </Animated.View>
       )}
 
-      {/* Current/outgoing sheet (on top) */}
+      {/* Current / outgoing sheet (on top) */}
       <Animated.View
-        style={[styles.layer, next ? outStyle : undefined]}
+        style={[styles.layer, next ? outStyle : entranceStyle]}
         pointerEvents={next ? 'none' : 'auto'}
       >
         {renderScreen(current)}
@@ -165,16 +212,10 @@ export default function App() {
 const styles = StyleSheet.create({
   backdrop: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    top: 0, left: 0, right: 0, bottom: 0,
   },
   layer: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    top: 0, left: 0, right: 0, bottom: 0,
   },
 });

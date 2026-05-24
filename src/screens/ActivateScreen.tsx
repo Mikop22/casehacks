@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import * as Haptics from 'expo-haptics';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts, radius, shadow } from '../theme';
 
@@ -22,14 +23,27 @@ export function ActivateScreen({
   pct = 5,
   onBack,
   onActivate,
+  onNoTrade,
 }: {
   pct?: number;
   onBack?: () => void;
   onActivate?: (accountId: AccountId) => void;
+  onNoTrade?: () => void;
 }) {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<AccountId>('tfsa');
   const [open, setOpen] = useState(false);
+  const dropAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.spring(dropAnim, {
+      toValue: open ? 1 : 0,
+      useNativeDriver: true,
+      damping: 22,
+      stiffness: 280,
+      mass: 0.8,
+    }).start();
+  }, [open]);
 
   const deposit = Math.round((PAYCHEQUE * pct) / 100);
   const threeMonths = deposit * NUM_DEPOSITS;
@@ -65,7 +79,7 @@ export function ActivateScreen({
         <Text style={styles.sectionLabel}>Deposit into</Text>
         <View style={styles.dropdown}>
           <Pressable
-            onPress={() => setOpen((o) => !o)}
+            onPress={() => { Haptics.selectionAsync(); setOpen((o) => !o); }}
             style={({ pressed }) => [styles.dropdownSelected, pressed && { opacity: 0.7 }]}
             accessibilityRole="button"
             accessibilityState={{ expanded: open }}
@@ -77,23 +91,33 @@ export function ActivateScreen({
             <Text style={[styles.chevron, open && styles.chevronOpen]}>›</Text>
           </Pressable>
 
-          {open && (
-            <View>
-              <View style={styles.optionDivider} />
-              {ACCOUNTS.filter((a) => a.id !== selected).map((acct, i, arr) => (
-                <View key={acct.id}>
-                  <Pressable
-                    onPress={() => { setSelected(acct.id); setOpen(false); }}
-                    style={({ pressed }) => [styles.option, pressed && { backgroundColor: colors.surface }]}
-                  >
-                    <Text style={styles.optionLabel}>{acct.label}</Text>
-                    <Text style={styles.optionMask}>•••• {acct.last4}</Text>
-                  </Pressable>
-                  {i < arr.length - 1 && <View style={styles.optionDivider} />}
-                </View>
-              ))}
-            </View>
-          )}
+          <Animated.View style={{
+            opacity: dropAnim,
+            transform: [{ translateY: dropAnim.interpolate({ inputRange: [0, 1], outputRange: [-6, 0] }) }],
+            overflow: 'hidden',
+          }}>
+            {open && (
+              <View>
+                <View style={styles.optionDivider} />
+                {ACCOUNTS.filter((a) => a.id !== selected).map((acct, i, arr) => (
+                  <View key={acct.id}>
+                    <Pressable
+                      onPress={() => {
+                        Haptics.selectionAsync();
+                        setSelected(acct.id);
+                        setOpen(false);
+                      }}
+                      style={({ pressed }) => [styles.option, pressed && { backgroundColor: colors.surface }]}
+                    >
+                      <Text style={styles.optionLabel}>{acct.label}</Text>
+                      <Text style={styles.optionMask}>•••• {acct.last4}</Text>
+                    </Pressable>
+                    {i < arr.length - 1 && <View style={styles.optionDivider} />}
+                  </View>
+                ))}
+              </View>
+            )}
+          </Animated.View>
         </View>
 
         {/* Summary */}
@@ -119,7 +143,7 @@ export function ActivateScreen({
 
         {/* CTA */}
         <Pressable
-          onPress={() => onActivate?.(selected)}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onActivate?.(selected); }}
           style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
           accessibilityRole="button"
           accessibilityLabel="Activate Launchpad"
@@ -194,8 +218,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
 
+  toggleRow: {
+    marginTop: 12,
+    alignSelf: 'center',
+  },
+  toggleText: {
+    fontFamily: fonts.regular,
+    fontSize: 12,
+    color: colors.gray400,
+    textDecorationLine: 'underline',
+  },
+
   sectionLabel: {
-    marginTop: 16,
+    marginTop: 12,
     marginBottom: 8,
     fontFamily: fonts.semibold,
     fontSize: 13,
