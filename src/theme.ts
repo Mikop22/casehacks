@@ -32,14 +32,14 @@ export const colors = {
   redWashBorder: '#F7C9CB',
 } as const;
 
-// Inter closely matches Scotia's grotesque Sharp Sans–derived typeface.
-// Avoid Poppins — its geometric roundness reads as startup, not Big Five bank.
+// Source Sans 3 is the closest free match to Frutiger, Scotiabank's licensed brand typeface.
+// Same humanist classification, open apertures, and organic terminal style.
 export const fonts = {
-  regular: 'Inter_400Regular',
-  medium: 'Inter_500Medium',
-  semibold: 'Inter_600SemiBold',
-  bold: 'Inter_700Bold',
-  extrabold: 'Inter_800ExtraBold',
+  regular: 'SourceSans3_400Regular',
+  medium: 'SourceSans3_500Medium',
+  semibold: 'SourceSans3_600SemiBold',
+  bold: 'SourceSans3_700Bold',
+  extrabold: 'SourceSans3_800ExtraBold',
 } as const;
 
 // 7.5px base increments from the Scotia design language
@@ -57,6 +57,7 @@ export const radius = {
   sm: 4,
   md: 8,
   lg: 12,
+  card: 12,
   pill: 999,
 } as const;
 

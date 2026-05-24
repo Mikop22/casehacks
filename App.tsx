@@ -4,12 +4,12 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
   useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  Inter_800ExtraBold,
-} from '@expo-google-fonts/inter';
+  SourceSans3_400Regular,
+  SourceSans3_500Medium,
+  SourceSans3_600SemiBold,
+  SourceSans3_700Bold,
+  SourceSans3_800ExtraBold,
+} from '@expo-google-fonts/source-sans-3';
 import { Backdrop } from './src/components/Backdrop';
 import { LaunchpadScreen } from './src/screens/LaunchpadScreen';
 import { CommitScreen } from './src/screens/CommitScreen';
@@ -34,11 +34,11 @@ export default function App() {
   const transitioning = useRef(false);
 
   const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-    Inter_800ExtraBold,
+    SourceSans3_400Regular,
+    SourceSans3_500Medium,
+    SourceSans3_600SemiBold,
+    SourceSans3_700Bold,
+    SourceSans3_800ExtraBold,
   });
 
   const navigate = useCallback(
