@@ -265,13 +265,14 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: radius.sm,
     paddingHorizontal: 14,
-    paddingBottom: 4,
+    paddingTop: 12,
+    paddingBottom: 12,
     ...shadow.card,
   },
   divider: {
     height: 1,
     backgroundColor: colors.border,
-    marginVertical: 10,
+    marginVertical: 8,
   },
   row: {
     flexDirection: 'row',
