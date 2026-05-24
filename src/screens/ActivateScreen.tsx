@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, fonts, radius, shadow, space } from '../theme';
+import { colors, fonts, radius, shadow } from '../theme';
 
 const ACCOUNTS = [
   { id: 'tfsa', label: 'TFSA', last4: '4821' },
@@ -29,6 +29,7 @@ export function ActivateScreen({
 }) {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<AccountId>('tfsa');
+  const [open, setOpen] = useState(false);
 
   const deposit = Math.round((PAYCHEQUE * pct) / 100);
   const threeMonths = deposit * NUM_DEPOSITS;
@@ -68,42 +69,49 @@ export function ActivateScreen({
               We'll deposit {pct}% of each paycheque into your selected Scotia{' '}iTRADE account.
             </Text>
 
-            {/* Account picker */}
+            {/* Account dropdown */}
             <Text style={styles.sectionLabel}>Deposit into</Text>
-            <View style={styles.accountList}>
-              {ACCOUNTS.map((acct) => {
-                const active = selected === acct.id;
-                return (
-                  <Pressable
-                    key={acct.id}
-                    onPress={() => setSelected(acct.id)}
-                    style={({ pressed }) => [
-                      styles.accountCard,
-                      active && styles.accountCardActive,
-                      pressed && !active && { opacity: 0.7 },
-                    ]}
-                    accessibilityRole="radio"
-                    accessibilityState={{ checked: active }}
-                    accessibilityLabel={`${acct.label} ending in ${acct.last4}`}
-                  >
-                    <View style={styles.accountInfo}>
-                      <Text style={[styles.accountLabel, active && styles.accountLabelActive]}>
-                        {acct.label}
-                      </Text>
-                      <Text style={styles.accountMask}>•••• {acct.last4}</Text>
+            <View style={styles.dropdown}>
+              {/* Selected row — always visible */}
+              <Pressable
+                onPress={() => setOpen((o) => !o)}
+                style={({ pressed }) => [styles.dropdownSelected, pressed && { opacity: 0.7 }]}
+                accessibilityRole="button"
+                accessibilityLabel={`Selected account: ${selectedAccount.label} ending in ${selectedAccount.last4}. Tap to change.`}
+                accessibilityState={{ expanded: open }}
+              >
+                <View style={styles.accountInfo}>
+                  <Text style={styles.accountLabel}>{selectedAccount.label}</Text>
+                  <Text style={styles.accountMask}>•••• {selectedAccount.last4}</Text>
+                </View>
+                <Text style={[styles.chevron, open && styles.chevronOpen]}>›</Text>
+              </Pressable>
+
+              {/* Options — visible when open */}
+              {open && (
+                <View style={styles.dropdownOptions}>
+                  <View style={styles.optionDivider} />
+                  {ACCOUNTS.filter((a) => a.id !== selected).map((acct, i, arr) => (
+                    <View key={acct.id}>
+                      <Pressable
+                        onPress={() => { setSelected(acct.id); setOpen(false); }}
+                        style={({ pressed }) => [styles.option, pressed && { backgroundColor: colors.surface }]}
+                        accessibilityRole="menuitem"
+                        accessibilityLabel={`${acct.label} ending in ${acct.last4}`}
+                      >
+                        <Text style={styles.optionLabel}>{acct.label}</Text>
+                        <Text style={styles.optionMask}>•••• {acct.last4}</Text>
+                      </Pressable>
+                      {i < arr.length - 1 && <View style={styles.optionDivider} />}
                     </View>
-                    <View style={[styles.radio, active && styles.radioActive]}>
-                      {active && <View style={styles.radioDot} />}
-                    </View>
-                  </Pressable>
-                );
-              })}
+                  ))}
+                </View>
+              )}
             </View>
 
             {/* Confirmation summary */}
             <View style={styles.confirm}>
               <View style={styles.divider} />
-
               <View style={styles.row}>
                 <Text style={styles.rowLabel}>Amount</Text>
                 <Text style={styles.rowValue}>{pct}% per paycheque</Text>
@@ -118,9 +126,7 @@ export function ActivateScreen({
                   iTRADE {selectedAccount.label} ···· {selectedAccount.last4}
                 </Text>
               </View>
-
               <View style={styles.divider} />
-
               <View style={styles.row}>
                 <Text style={styles.rowLabel}>Bonus estimate</Text>
                 <Text style={styles.rowValueBonus}>+{money(bonusEstimate)}</Text>
@@ -146,12 +152,8 @@ export function ActivateScreen({
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
-  layer: {
-    flex: 1,
-  },
+  root: { flex: 1 },
+  layer: { flex: 1 },
   sheet: {
     flex: 1,
     backgroundColor: colors.white,
@@ -195,9 +197,7 @@ const styles = StyleSheet.create({
   },
 
   // ── Scroll ──
-  scroll: {
-    flex: 1,
-  },
+  scroll: { flex: 1 },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
 
-  // ── Account picker ──
+  // ── Dropdown ──
   sectionLabel: {
     marginTop: 20,
     marginBottom: 10,
@@ -231,33 +231,25 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.gray700,
   },
-  accountList: {
-    gap: 8,
-  },
-  accountCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.white,
+  dropdown: {
     borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: radius.sm,
+    backgroundColor: colors.white,
+    overflow: 'hidden',
+    ...shadow.card,
+  },
+  dropdownSelected: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 13,
     paddingHorizontal: 16,
   },
-  accountCardActive: {
-    borderColor: colors.red,
-    backgroundColor: colors.redWash,
-  },
-  accountInfo: {
-    flex: 1,
-  },
+  accountInfo: { flex: 1 },
   accountLabel: {
     fontFamily: fonts.semibold,
     fontSize: 14,
     color: colors.inkStrong,
-  },
-  accountLabelActive: {
-    color: colors.red,
   },
   accountMask: {
     marginTop: 2,
@@ -265,23 +257,36 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.gray500,
   },
-  radio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: colors.gray300,
-    alignItems: 'center',
-    justifyContent: 'center',
+  chevron: {
+    fontSize: 22,
+    lineHeight: 26,
+    color: colors.gray400,
+    fontFamily: fonts.regular,
+    transform: [{ rotate: '90deg' }],
   },
-  radioActive: {
-    borderColor: colors.red,
+  chevronOpen: {
+    transform: [{ rotate: '-90deg' }],
   },
-  radioDot: {
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-    backgroundColor: colors.red,
+  dropdownOptions: {},
+  optionDivider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginHorizontal: 16,
+  },
+  option: {
+    paddingVertical: 13,
+    paddingHorizontal: 16,
+  },
+  optionLabel: {
+    fontFamily: fonts.medium,
+    fontSize: 14,
+    color: colors.inkStrong,
+  },
+  optionMask: {
+    marginTop: 2,
+    fontFamily: fonts.regular,
+    fontSize: 12,
+    color: colors.gray500,
   },
 
   // ── Confirmation ──
@@ -323,9 +328,7 @@ const styles = StyleSheet.create({
   },
 
   // ── Footer ──
-  footer: {
-    paddingTop: 12,
-  },
+  footer: { paddingTop: 12 },
   cta: {
     height: 56,
     borderRadius: radius.sm,
