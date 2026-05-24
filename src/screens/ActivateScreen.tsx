@@ -201,23 +201,23 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingTop: 8,
-    paddingBottom: 12,
+    paddingTop: 4,
+    paddingBottom: 8,
   },
 
   // ── Header ──
   headline: {
     fontFamily: fonts.bold,
-    fontSize: 21,
+    fontSize: 19,
     letterSpacing: -0.3,
     color: colors.inkStrong,
     textAlign: 'center',
   },
   sub: {
-    marginTop: 8,
+    marginTop: 6,
     fontFamily: fonts.regular,
-    fontSize: 13.5,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 19,
     color: colors.gray600,
     textAlign: 'center',
     paddingHorizontal: 12,
@@ -225,8 +225,8 @@ const styles = StyleSheet.create({
 
   // ── Dropdown ──
   sectionLabel: {
-    marginTop: 20,
-    marginBottom: 10,
+    marginTop: 16,
+    marginBottom: 8,
     fontFamily: fonts.semibold,
     fontSize: 13,
     color: colors.gray700,
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   dropdownSelected: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 13,
+    paddingVertical: 11,
     paddingHorizontal: 16,
   },
   accountInfo: { flex: 1 },
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   option: {
-    paddingVertical: 13,
+    paddingVertical: 11,
     paddingHorizontal: 16,
   },
   optionLabel: {
@@ -291,25 +291,25 @@ const styles = StyleSheet.create({
 
   // ── Confirmation ──
   confirm: {
-    marginTop: 20,
+    marginTop: 16,
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: radius.sm,
-    padding: 16,
+    padding: 14,
     ...shadow.card,
   },
   divider: {
     width: '100%',
     height: 1,
     backgroundColor: colors.border,
-    marginVertical: 12,
+    marginVertical: 10,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    paddingVertical: 4,
+    paddingVertical: 3,
   },
   rowLabel: {
     fontFamily: fonts.regular,
