@@ -13,20 +13,20 @@ import { colors, fonts, radius, space } from '../theme';
 const SCREEN_H = Dimensions.get('window').height;
 
 const TABLE_ROWS = [
-  { contribution: 'Up to $249 / mo',  match: '5%',  bonus: 'Up to $50'  },
-  { contribution: '$250 – $499 / mo', match: '10%', bonus: 'Up to $100' },
-  { contribution: '$500 – $999 / mo', match: '15%', bonus: 'Up to $200' },
-  { contribution: '$1,000+ / mo',     match: '25%', bonus: 'Up to $500' },
+  { contribution: 'Up to $249',  match: '5%',  bonus: 'Up to $50'  },
+  { contribution: '$250 – $499', match: '10%', bonus: 'Up to $100' },
+  { contribution: '$500 – $999', match: '15%', bonus: 'Up to $200' },
+  { contribution: '$1,000+',     match: '25%', bonus: 'Up to $500' },
 ];
 
 const FAQS = [
   {
     q: 'How do I get this bonus?',
-    a: 'Open a Scotia iTRADE account through Launchpad and set up a recurring monthly contribution. Once your first contribution clears, Scotiabank matches it — deposited directly into your iTRADE account.',
+    a: 'Open a Scotia iTRADE account through Launchpad and select your contribution amount at sign-up. Once your contribution clears, Scotiabank deposits your matched bonus directly into your iTRADE account.',
   },
   {
     q: 'How is the bonus calculated?',
-    a: 'Your bonus is a percentage of what you contribute each month, capped at $500. The higher your monthly deposit, the higher your match rate. Your tier is set on your first qualifying contribution.',
+    a: 'Your bonus is a percentage of your initial contribution, capped at $500. The higher your deposit, the higher your match rate.',
   },
   {
     q: 'What is Scotia iTRADE?',
@@ -38,7 +38,7 @@ const FAQS = [
   },
   {
     q: 'When will I receive the bonus?',
-    a: "Matched funds are deposited within 30 business days of your first qualifying contribution. You'll get an in-app notification and email when it lands.",
+    a: "Matched funds are deposited within 30 business days of your qualifying contribution. You'll get an in-app notification and email when it lands.",
   },
 ];
 
@@ -109,6 +109,7 @@ export function BonusExplanationScreen({ onBack }: { onBack?: () => void }) {
   // Hero entrance — each element fades + slides up in sequence
   const heroAnims = useRef([0, 1, 2].map(() => new Animated.Value(0))).current;
   const arrowNudge = useRef(new Animated.Value(0)).current;
+  const arrowPulse = useRef(new Animated.Value(1)).current;
 
   // Below-fold section reveals
   const tableAnim = useRef(new Animated.Value(0)).current;
@@ -132,8 +133,14 @@ export function BonusExplanationScreen({ onBack }: { onBack?: () => void }) {
       ).start(() => {
         Animated.loop(
           Animated.sequence([
-            Animated.timing(arrowNudge, { toValue: 6, duration: 600, useNativeDriver: true }),
-            Animated.timing(arrowNudge, { toValue: 0, duration: 600, useNativeDriver: true }),
+            Animated.timing(arrowNudge, { toValue: 9, duration: 650, useNativeDriver: true }),
+            Animated.timing(arrowNudge, { toValue: 0, duration: 650, useNativeDriver: true }),
+          ]),
+        ).start();
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(arrowPulse, { toValue: 0.2, duration: 650, useNativeDriver: true }),
+            Animated.timing(arrowPulse, { toValue: 1, duration: 650, useNativeDriver: true }),
           ]),
         ).start();
       });
@@ -218,15 +225,33 @@ export function BonusExplanationScreen({ onBack }: { onBack?: () => void }) {
           </Animated.View>
 
           <Animated.Text style={[styles.heroSub, fadeUp(heroAnims[2])]}>
-            Scotiabank matches a percentage of your monthly contributions
-            to Scotia iTRADE. The more you invest, the bigger the match.
+            Scotiabank matches a percentage of your initial contribution
+            to Scotia iTRADE. The more you invest, the bigger the bonus.
           </Animated.Text>
 
-          <Animated.Text
-            style={[styles.scrollArrow, { transform: [{ translateY: arrowNudge }] }]}
+          {/* Scroll fade-out — JS thread */}
+          <Animated.View
+            style={[
+              styles.scrollArrowWrap,
+              {
+                opacity: scrollY.interpolate({
+                  inputRange: [0, 80],
+                  outputRange: [1, 0],
+                  extrapolate: 'clamp',
+                }),
+              },
+            ]}
           >
-            ↓
-          </Animated.Text>
+            {/* Bounce + opacity pulse — native thread */}
+            <Animated.Text
+              style={[
+                styles.scrollArrowIcon,
+                { transform: [{ translateY: arrowNudge }], opacity: arrowPulse },
+              ]}
+            >
+              ↓
+            </Animated.Text>
+          </Animated.View>
         </View>
 
         {/* ── Contribution table ── */}
@@ -236,7 +261,7 @@ export function BonusExplanationScreen({ onBack }: { onBack?: () => void }) {
 
           <View style={styles.tableCard}>
             <View style={[styles.tableRow, styles.tableHeaderRow]}>
-              <Text style={[styles.col1, styles.thText]}>Monthly deposit</Text>
+              <Text style={[styles.col1, styles.thText]}>Contribution</Text>
               <Text style={[styles.col2, styles.thText]}>Match</Text>
               <Text style={[styles.col3, styles.thText]}>Bonus</Text>
             </View>
@@ -249,9 +274,6 @@ export function BonusExplanationScreen({ onBack }: { onBack?: () => void }) {
             ))}
           </View>
 
-          <Text style={styles.disclaimer}>
-            Placeholder values · final terms at scotiabank.com/launchpad
-          </Text>
         </Animated.View>
 
         {/* ── FAQ ── */}
@@ -332,11 +354,15 @@ const styles = StyleSheet.create({
     marginTop: space.lg,
     maxWidth: 300,
   },
-  scrollArrow: {
+  scrollArrowWrap: {
     position: 'absolute',
     bottom: space.xl,
-    fontSize: 18,
-    color: colors.gray400,
+    alignItems: 'center',
+  },
+  scrollArrowIcon: {
+    fontSize: 30,
+    color: colors.red,
+    lineHeight: 34,
   },
 
   // Sections
@@ -385,14 +411,6 @@ const styles = StyleSheet.create({
   tdDeposit: { fontFamily: fonts.regular, color: colors.ink },
   tdMatch: { fontFamily: fonts.bold, color: colors.red, textAlign: 'center' },
   tdBonus: { fontFamily: fonts.semibold, color: colors.inkStrong, textAlign: 'right' },
-  disclaimer: {
-    marginTop: 10,
-    fontFamily: fonts.regular,
-    fontSize: 11,
-    color: colors.gray400,
-    textAlign: 'center',
-  },
-
   // FAQ
   faqCard: {
     borderRadius: radius.md,
