@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scotiabank Launchpad: Powered by iTRADE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* === THEME === */
+    :root {
+      --red: #ec111a;
+      --red-dark: #bb061b;
+      --ink: #333333;
+      --body-color: #555555;
+      --white: #ffffff;
+      --canvas: #fafbfd;
+      --border: #e2e8ee;
+      --gray-light: #f5f6fc;
+      --gray-mid: #a8a8a8;
+      --font: 'Source Sans 3', Arial, sans-serif;
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+      /* Larger sizes throughout */
+      --band-height: clamp(56px, 9vh, 84px);
+      --title-size:  clamp(2.8rem, 8vw, 7rem);
+      --h2-size:     clamp(1.8rem, 4.5vw, 3.4rem);
+      --h3-size:     clamp(1.2rem, 2.8vw, 2.1rem);
+      --body-size:   clamp(1rem, 1.9vw, 1.4rem);
+      --small-size:  clamp(0.8rem, 1.35vw, 1.05rem);
+      --band-label-size: clamp(0.9rem, 1.7vw, 1.3rem);
+      --stat-value-size: clamp(2.2rem, 6vw, 5rem);
+      --step-num-size:   clamp(1.2rem, 2.8vw, 2rem);
+      --big-quote-size:  clamp(2rem, 5.5vw, 5rem);
+
+      --slide-padding: clamp(1.2rem, 3.2vw, 3.5rem);
+      --content-gap:   clamp(0.6rem, 1.8vw, 1.5rem);
+    }
+
+    /* === RESET === */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* === VIEWPORT BASE === */
+    html, body { height: 100%; overflow-x: hidden; }
+    html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+    .slide {
+      width: 100vw; height: 100vh; height: 100dvh;
+      overflow: hidden; scroll-snap-align: start;
+      display: flex; flex-direction: column; position: relative;
+    }
+    .slide-content {
+      flex: 1; display: flex; flex-direction: column;
+      justify-content: center; max-height: 100%; overflow: hidden;
+      padding: var(--slide-padding);
+    }
+    img, .image-container { max-width: 100%; max-height: min(50vh,400px); object-fit: contain; }
+
+    @media (max-height: 700px) {
+      :root {
+        --slide-padding: clamp(0.75rem,3vw,2rem);
+        --h2-size: clamp(1.2rem,3vw,2rem);
+        --band-height: clamp(42px,6vh,58px);
+        --body-size: clamp(0.85rem,1.5vw,1.1rem);
+        --stat-value-size: clamp(1.6rem,4.5vw,3.5rem);
+      }
+    }
+    @media (max-height: 600px) {
+      :root {
+        --slide-padding: clamp(0.5rem,2.5vw,1.5rem);
+        --h2-size: clamp(1rem,3vw,1.75rem);
+        --body-size: clamp(0.75rem,1.2vw,1rem);
+      }
+      .nav-dots, .decorative { display: none; }
+    }
+    @media (max-height: 500px) {
+      :root {
+        --slide-padding: clamp(0.4rem,2vw,1rem);
+        --h2-size: clamp(0.9rem,2.5vw,1.4rem);
+        --body-size: clamp(0.7rem,1vw,0.9rem);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* === GLOBAL === */
+    body { font-family: var(--font); color: var(--ink); background: var(--canvas); }
+
+    /* === ANIMATIONS === */
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+    }
+    .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+    .reveal:nth-child(1) { transition-delay: 0.05s; }
+    .reveal:nth-child(2) { transition-delay: 0.15s; }
+    .reveal:nth-child(3) { transition-delay: 0.25s; }
+    .reveal:nth-child(4) { transition-delay: 0.35s; }
+    .reveal:nth-child(5) { transition-delay: 0.45s; }
+    .reveal:nth-child(6) { transition-delay: 0.55s; }
+    .reveal-l {
+      opacity: 0; transform: translateX(-20px);
+      transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+    }
+    .slide.visible .reveal-l { opacity: 1; transform: translateX(0); }
+    .reveal-l:nth-child(1) { transition-delay: 0.1s; }
+    .reveal-l:nth-child(2) { transition-delay: 0.2s; }
+    .reveal-l:nth-child(3) { transition-delay: 0.3s; }
+    .reveal-l:nth-child(4) { transition-delay: 0.4s; }
+    .reveal-l:nth-child(5) { transition-delay: 0.5s; }
+    .reveal-r {
+      opacity: 0; transform: translateX(20px);
+      transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+      transition-delay: 0.3s;
+    }
+    .slide.visible .reveal-r { opacity: 1; transform: translateX(0); }
+
+    /* === PROGRESS BAR === */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: var(--red); z-index: 1000;
+      transition: width 0.4s var(--ease-out-expo);
+    }
+
+    /* === NAV DOTS === */
+    .nav-dots {
+      position: fixed; right: clamp(0.75rem,2vw,1.25rem);
+      top: 50%; transform: translateY(-50%);
+      display: flex; flex-direction: column;
+      gap: clamp(0.3rem,0.8vh,0.5rem); z-index: 999;
+    }
+    .nav-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--border); border: none;
+      cursor: pointer; transition: all 0.3s ease; padding: 0;
+    }
+    .nav-dot.active { background: var(--red); transform: scale(1.5); }
+
+    /* === RED BAND === */
+    .slide-band {
+      background: var(--red); height: var(--band-height);
+      display: flex; align-items: center;
+      padding: 0 var(--slide-padding);
+      flex-shrink: 0; z-index: 5;
+    }
+    .band-title {
+      font-size: var(--band-label-size); font-weight: 700;
+      color: var(--white); text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .band-section {
+      font-size: clamp(0.65rem,1.1vw,0.9rem); font-weight: 400;
+      color: rgba(255,255,255,0.65); text-transform: uppercase;
+      letter-spacing: 0.06em; margin-left: auto;
+    }
+
+    /* === FOOTER === */
+    .page-num {
+      position: absolute; bottom: clamp(0.75rem,2vh,1.25rem);
+      right: clamp(1rem,2.5vw,2rem);
+      font-size: clamp(0.6rem,0.95vw,0.8rem);
+      color: var(--gray-mid); font-weight: 600; letter-spacing: 0.05em; z-index: 10;
+    }
+    .case-note {
+      position: absolute; bottom: clamp(0.75rem,2vh,1.25rem);
+      left: var(--slide-padding);
+      font-size: clamp(0.55rem,0.85vw,0.7rem);
+      color: var(--gray-mid); z-index: 10;
+    }
+
+    /* === TYPOGRAPHY === */
+    .slide h2 {
+      font-size: var(--h2-size); font-weight: 900;
+      color: var(--ink); line-height: 1.1;
+      margin-bottom: clamp(0.5rem,1.4vh,1rem);
+    }
+    .slide h3 { font-size: var(--h3-size); font-weight: 700; color: var(--ink); line-height: 1.2; }
+    .slide p { font-size: var(--body-size); color: var(--body-color); line-height: 1.65; }
+    .takeaway {
+      font-size: var(--body-size); font-weight: 700; color: var(--red);
+      padding: clamp(0.6rem,1.6vh,1.1rem) clamp(0.8rem,2vw,1.4rem);
+      border-left: 4px solid var(--red); background: rgba(236,17,26,0.05);
+      line-height: 1.5;
+    }
+    .rule { height: 1px; background: var(--border); margin: clamp(0.5rem,1.4vh,1.1rem) 0; }
+
+    /* === BULLET LIST === */
+    .bullet-list { list-style: none; display: flex; flex-direction: column; gap: clamp(0.45rem,1.2vh,1rem); }
+    .bullet-list li {
+      font-size: var(--body-size); color: var(--body-color);
+      line-height: 1.55; padding-left: clamp(1.1rem,2.2vw,1.7rem); position: relative;
+    }
+    .bullet-list li::before {
+      content: ''; position: absolute; left: 0; top: 0.55em;
+      width: 6px; height: 6px; background: var(--red); border-radius: 50%;
+    }
+    .bullet-list li strong { color: var(--ink); font-weight: 700; }
+
+    /* === STAT CARDS === */
+    .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: clamp(0.5rem,1.5vw,1.25rem); }
+    .stat-card {
+      background: var(--gray-light); border: 1px solid var(--border);
+      border-top: 3px solid var(--red);
+      padding: clamp(0.8rem,2.2vh,1.4rem) clamp(0.8rem,2vw,1.3rem);
+      display: flex; flex-direction: column; gap: clamp(0.2rem,0.5vh,0.5rem);
+    }
+    .stat-value { font-size: var(--stat-value-size); font-weight: 900; color: var(--red); line-height: 1; }
+    .stat-label { font-size: var(--small-size); color: var(--body-color); line-height: 1.45; }
+
+    /* === STEPS === */
+    .steps-list { display: flex; flex-direction: column; gap: clamp(0.4rem,1.1vh,0.9rem); }
+    .step-item {
+      display: flex; align-items: flex-start;
+      gap: clamp(0.7rem,1.6vw,1.4rem);
+      padding: clamp(0.5rem,1.2vh,0.9rem);
+      background: var(--gray-light); border: 1px solid var(--border);
+    }
+    .step-num {
+      font-size: var(--step-num-size); font-weight: 900; color: var(--red);
+      line-height: 1; min-width: clamp(1.4rem,2.8vw,2.3rem); flex-shrink: 0; padding-top: 0.08em;
+    }
+    .step-text { font-size: var(--body-size); color: var(--body-color); line-height: 1.5; }
+    .step-text strong { color: var(--ink); font-weight: 700; display: block; }
+
+    /* === TWO-COL === */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem,3vw,3rem); align-items: start; }
+    @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+    .col-divider { border-left: 2px solid var(--red); padding-left: clamp(0.75rem,2vw,1.5rem); }
+
+    /* === ART LAYOUT (text left, SVG right) === */
+    .art-slide-content {
+      display: grid !important;
+      grid-template-columns: 56% 44%;
+      gap: clamp(1rem, 3vw, 3rem);
+      align-items: center;
+      padding: var(--slide-padding);
+    }
+    .art-col-left { display: flex; flex-direction: column; gap: clamp(0.5rem,1.3vh,1.1rem); overflow: hidden; }
+    .art-col-right {
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .art-col-right svg { width: 100%; height: auto; max-height: min(64vh, 460px); }
+    @media (max-width: 700px) {
+      .art-slide-content { grid-template-columns: 1fr; }
+      .art-col-right { display: none; }
+    }
+
+    /* === TAG === */
+    .tag {
+      display: inline-block; font-size: var(--small-size);
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      padding: clamp(0.25rem,0.55vh,0.4rem) clamp(0.55rem,1.1vw,0.9rem);
+      background: var(--red); color: var(--white);
+      margin-bottom: clamp(0.45rem,1.1vh,0.85rem);
+    }
+
+    /* === DATA TABLE === */
+    .data-table { width: 100%; border-collapse: collapse; font-size: var(--body-size); }
+    .data-table th {
+      font-size: var(--small-size); font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--white); background: var(--ink);
+      padding: clamp(0.5rem,1.2vh,0.8rem) clamp(0.8rem,1.6vw,1.3rem); text-align: left;
+    }
+    .data-table td {
+      padding: clamp(0.5rem,1.2vh,0.8rem) clamp(0.8rem,1.6vw,1.3rem);
+      color: var(--body-color); border-bottom: 1px solid var(--border);
+    }
+    .data-table td:first-child { color: var(--ink); font-weight: 600; }
+    .data-table tr.hl-row td { background: rgba(236,17,26,0.06); }
+    .data-table tr.hl-row td:first-child { color: var(--red); font-weight: 700; }
+
+    /* === NUDGE CARDS === */
+    .nudge-card {
+      background: var(--gray-light); border: 1px solid var(--border);
+      border-left: 4px solid var(--red);
+      padding: clamp(0.6rem,1.6vh,1rem) clamp(0.8rem,2vw,1.3rem);
+      display: flex; flex-direction: column; gap: clamp(0.2rem,0.5vh,0.4rem);
+    }
+    .nudge-label {
+      font-size: clamp(0.65rem,1.05vw,0.85rem); font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--red);
+    }
+    .nudge-text { font-size: var(--body-size); color: var(--ink); font-style: italic; }
+
+    /* === PRINCIPLE GRID === */
+    .principle-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: clamp(0.5rem,1.3vw,1.1rem); }
+    @media (max-width: 800px) { .principle-grid { grid-template-columns: repeat(3,1fr); } }
+    .principle-card {
+      background: var(--gray-light); border: 1px solid var(--border);
+      border-top: 3px solid var(--red);
+      padding: clamp(0.6rem,1.6vh,1.1rem) clamp(0.6rem,1.3vw,1rem);
+      display: flex; flex-direction: column; gap: clamp(0.25rem,0.7vh,0.6rem);
+    }
+    .p-icon { font-size: clamp(1.2rem,2.4vw,1.9rem); font-weight: 900; color: var(--red); line-height: 1; }
+    .p-title { font-size: clamp(0.75rem,1.3vw,1rem); font-weight: 700; color: var(--ink); text-transform: uppercase; letter-spacing: 0.04em; }
+    .p-body { font-size: clamp(0.7rem,1.1vw,0.9rem); color: var(--body-color); line-height: 1.45; }
+
+    /* === TITLE SLIDE === */
+    .title-slide { background: var(--red); }
+    .title-slide .slide-content { justify-content: flex-end; padding-bottom: clamp(3.5rem,9vh,7rem); }
+    .title-slide .eyebrow {
+      font-size: clamp(0.7rem,1.2vw,0.95rem); font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.65); margin-bottom: clamp(0.5rem,1.3vh,0.85rem);
+    }
+    .title-slide h1 {
+      font-size: var(--title-size); font-weight: 900;
+      color: var(--white); line-height: 0.92;
+      margin-bottom: clamp(0.6rem,1.6vh,1.2rem);
+    }
+    .title-slide .sub-title {
+      font-size: clamp(1rem,2.2vw,1.8rem); font-weight: 400;
+      color: rgba(255,255,255,0.82); margin-bottom: clamp(0.9rem,2.2vh,1.8rem);
+    }
+    .title-rule { width: clamp(56px,9vw,96px); height: 4px; background: rgba(255,255,255,0.8); }
+
+    /* === CLOSING SLIDES === */
+    .closing-slide { background: var(--red); }
+    .closing-slide .slide-content { justify-content: center; }
+    .closing-slide .big-quote {
+      font-size: var(--big-quote-size); font-weight: 900;
+      color: var(--white); line-height: 1.1; max-width: min(90vw,1000px);
+    }
+    .closing-slide .big-quote span { opacity: 0.6; }
+    .closing-slide .cq-sub {
+      color: rgba(255,255,255,0.78); margin-top: clamp(1rem,2.5vh,2rem);
+      max-width: 58ch; font-size: var(--body-size); line-height: 1.7;
+    }
+    .closing-slide .case-note { color: rgba(255,255,255,0.4); }
+    .closing-slide .page-num { color: rgba(255,255,255,0.4); }
+
+    /* === BACKGROUND WAVE DECORATION === */
+    .deco-wave {
+      position: absolute; bottom: 0; right: 0;
+      width: 62%; pointer-events: none; z-index: 0; opacity: 0.38;
+    }
+    .slide-content, .slide-band { position: relative; z-index: 1; }
+
+    /* === SOURCES === */
+    .source-item {
+      padding: clamp(0.5rem,1.2vh,0.8rem) 0;
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: clamp(0.15rem,0.4vh,0.3rem);
+    }
+    .source-title { font-size: var(--body-size); font-weight: 700; color: var(--ink); }
+    .source-url { font-size: var(--small-size); color: var(--red); font-family: monospace; }
+    .source-note { font-size: clamp(0.7rem,1.05vw,0.85rem); color: var(--body-color); }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+  <nav class="nav-dots" id="navDots" aria-label="Slide navigation"></nav>
+
+  <!-- ════════════════════════════════
+       01 TITLE
+       ════════════════════════════════ -->
+  <section class="slide title-slide" id="slide-1">
+    <!-- Background wave chart decoration -->
+    <svg class="deco-wave" viewBox="0 0 600 360" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line x1="0" y1="72"  x2="600" y2="72"  stroke="white" stroke-width="0.8" stroke-opacity="0.12"/>
+      <line x1="0" y1="144" x2="600" y2="144" stroke="white" stroke-width="0.8" stroke-opacity="0.12"/>
+      <line x1="0" y1="216" x2="600" y2="216" stroke="white" stroke-width="0.8" stroke-opacity="0.12"/>
+      <line x1="0" y1="288" x2="600" y2="288" stroke="white" stroke-width="0.8" stroke-opacity="0.12"/>
+      <path d="M0,320 C80,308 140,295 200,280 S310,238 390,205 S510,148 600,88" stroke="white" stroke-opacity="0.5" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M0,320 C80,308 140,295 200,280 S310,238 390,205 S510,148 600,88 L600,360 L0,360 Z" fill="white" fill-opacity="0.05"/>
+      <circle cx="200" cy="280" r="5.5" fill="white" fill-opacity="0.55"/>
+      <circle cx="300" cy="248" r="5.5" fill="white" fill-opacity="0.6"/>
+      <circle cx="390" cy="205" r="6.5" fill="white" fill-opacity="0.7"/>
+      <circle cx="490" cy="160" r="7" fill="white" fill-opacity="0.75"/>
+      <circle cx="600" cy="88"  r="11" fill="white" fill-opacity="0.85"/>
+      <circle cx="600" cy="88"  r="6"  fill="rgba(236,17,26,0.7)"/>
+    </svg>
+    <div class="slide-content">
+      <p class="eyebrow reveal">Case Competition 2026 — Scotia iTRADE</p>
+      <h1 class="reveal">SCOTIABANK<br>LAUNCHPAD</h1>
+      <p class="sub-title reveal">Powered by iTRADE</p>
+      <div class="title-rule reveal"></div>
+      <p class="reveal" style="color:rgba(255,255,255,0.72);font-size:var(--body-size);margin-top:clamp(0.6rem,1.8vh,1.2rem);max-width:55ch;">Converting Gen Z interest into automated, recurring investment behavior.</p>
+    </div>
+    <div class="case-note" style="color:rgba(255,255,255,0.4);">Case competition concept — synthetic data</div>
+    <div class="page-num" style="color:rgba(255,255,255,0.4);">01 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       02 THE PROBLEM
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-2">
+    <div class="slide-band">
+      <span class="band-title">The Problem</span>
+      <span class="band-section">Customer &amp; Business Context</span>
+    </div>
+    <div class="slide-content" style="justify-content:flex-start;padding-top:clamp(1rem,3vh,2rem);">
+      <h2 class="reveal">The Gap</h2>
+      <p class="reveal">Scotiabank faces a structural gap converting younger Canadians (18–34) into active investors — despite the largest intergenerational wealth transfer in Canadian history.</p>
+      <div class="rule reveal"></div>
+      <ul class="bullet-list">
+        <li class="reveal"><strong>$1 Trillion+</strong> in wealth expected to transfer to younger Canadians</li>
+        <li class="reveal">Many <strong>lack confidence and direction</strong> to begin investing</li>
+        <li class="reveal"><strong>82%</strong> of investors aged 18–24 use social media for investment information</li>
+        <li class="reveal">This demographic relies on <strong>creators and influencers</strong>, not financial advisors</li>
+      </ul>
+      <div class="takeaway reveal">Young Canadians are interested in investing — but do not trust traditional banking entry points.</div>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">02 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       03 TARGET MARKET — art layout
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-3">
+    <div class="slide-band">
+      <span class="band-title">Target Market</span>
+      <span class="band-section">Evidence &amp; Market Context</span>
+    </div>
+    <div class="slide-content art-slide-content">
+      <div class="art-col-left">
+        <h2 class="reveal">Ages 18–34</h2>
+        <div class="stat-row reveal">
+          <div class="stat-card">
+            <div class="stat-value">$1T+</div>
+            <div class="stat-label">Wealth expected to be inherited by younger Canadians</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">82%</div>
+            <div class="stat-label">Of investors 18–24 use social media for investing info</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">Gen Z</div>
+            <div class="stat-label">Relies on creators and influencers rather than advisors</div>
+          </div>
+        </div>
+        <div class="takeaway reveal">The opportunity: build the entry point where they already are.</div>
+      </div>
+      <!-- Wealth / investment illustration -->
+      <div class="art-col-right reveal-r">
+        <svg viewBox="0 0 360 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="180" cy="200" r="172" fill="#f5f6fc"/>
+          <!-- Coin stack 1 (small, left) -->
+          <ellipse cx="82" cy="295" rx="36" ry="10" fill="#d0d6e0"/>
+          <rect x="46" y="272" width="72" height="23" fill="#d0d6e0"/>
+          <ellipse cx="82" cy="272" rx="36" ry="10" fill="#bcc4d0"/>
+          <ellipse cx="82" cy="260" rx="36" ry="10" fill="#d0d6e0"/>
+          <rect x="46" y="237" width="72" height="23" fill="#d0d6e0"/>
+          <ellipse cx="82" cy="237" rx="36" ry="10" fill="#bcc4d0"/>
+          <!-- Coin stack 2 (medium, center) -->
+          <ellipse cx="180" cy="308" rx="44" ry="12" fill="#dde2eb"/>
+          <rect x="136" y="278" width="88" height="30" fill="#dde2eb"/>
+          <ellipse cx="180" cy="278" rx="44" ry="12" fill="#cad1dc"/>
+          <ellipse cx="180" cy="265" rx="44" ry="12" fill="#dde2eb"/>
+          <rect x="136" y="235" width="88" height="30" fill="#dde2eb"/>
+          <ellipse cx="180" cy="235" rx="44" ry="12" fill="#cad1dc"/>
+          <ellipse cx="180" cy="222" rx="44" ry="12" fill="rgba(236,17,26,0.18)"/>
+          <!-- Coin stack 3 (tall, right — red accent) -->
+          <ellipse cx="285" cy="296" rx="40" ry="11" fill="#dde2eb"/>
+          <rect x="245" y="270" width="80" height="26" fill="#dde2eb"/>
+          <ellipse cx="285" cy="270" rx="40" ry="11" fill="#cad1dc"/>
+          <ellipse cx="285" cy="257" rx="40" ry="11" fill="#dde2eb"/>
+          <rect x="245" y="231" width="80" height="26" fill="#dde2eb"/>
+          <ellipse cx="285" cy="231" rx="40" ry="11" fill="#cad1dc"/>
+          <ellipse cx="285" cy="218" rx="40" ry="11" fill="#dde2eb"/>
+          <rect x="245" y="192" width="80" height="26" fill="#dde2eb"/>
+          <ellipse cx="285" cy="192" rx="40" ry="11" fill="rgba(236,17,26,0.28)"/>
+          <!-- Upward arrow -->
+          <line x1="180" y1="214" x2="180" y2="120" stroke="#ec111a" stroke-width="3.5" stroke-linecap="round"/>
+          <polygon points="170,132 180,108 190,132" fill="#ec111a"/>
+          <!-- Dollar circle -->
+          <circle cx="180" cy="86" r="34" fill="white" stroke="#ec111a" stroke-width="2.5"/>
+          <circle cx="180" cy="86" r="26" fill="rgba(236,17,26,0.07)"/>
+          <!-- Dollar sign paths -->
+          <line x1="180" y1="62" x2="180" y2="110" stroke="#ec111a" stroke-width="2.8" stroke-linecap="round"/>
+          <path d="M192,71 Q207,71 207,80 Q207,90 180,92" stroke="#ec111a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M168,92 Q155,93 155,103 Q155,113 168,115" stroke="#ec111a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <!-- Connecting dots -->
+          <circle cx="82"  cy="232" r="5" fill="rgba(236,17,26,0.3)"/>
+          <circle cx="180" cy="216" r="5" fill="rgba(236,17,26,0.4)"/>
+          <circle cx="285" cy="185" r="5" fill="rgba(236,17,26,0.5)"/>
+          <line x1="82" y1="232" x2="180" y2="216" stroke="rgba(236,17,26,0.2)" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <line x1="180" y1="216" x2="285" y2="185" stroke="rgba(236,17,26,0.2)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        </svg>
+      </div>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">03 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       04 WHY TIKTOK — art layout
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-4">
+    <div class="slide-band">
+      <span class="band-title">Platform Selection</span>
+      <span class="band-section">Evidence &amp; Market Context</span>
+    </div>
+    <div class="slide-content art-slide-content">
+      <div class="art-col-left">
+        <h2 class="reveal">Why TikTok</h2>
+        <div class="stat-row reveal">
+          <div class="stat-card">
+            <div class="stat-value">16.6M</div>
+            <div class="stat-label">Canadians on TikTok (2024)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">43%</div>
+            <div class="stat-label">Aged 18–29; 33% aged 30–39</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">~10M</div>
+            <div class="stat-label">In the 18–34 target demo (~60% of users)</div>
+          </div>
+        </div>
+        <ul class="bullet-list">
+          <li class="reveal"><strong>Highly engaging</strong> — short-form content explains finance accessibly</li>
+          <li class="reveal"><strong>Cost-efficient</strong> — lower cost per acquisition than traditional ads</li>
+          <li class="reveal"><strong>Authentic reach</strong> — creators build trust corporate ads cannot</li>
+        </ul>
+        <div class="takeaway reveal">TikTok is the most effective platform to reach the 18–34 demographic at scale.</div>
+      </div>
+      <!-- Phone / social feed illustration -->
+      <div class="art-col-right reveal-r">
+        <svg viewBox="0 0 240 430" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- Phone body -->
+          <rect x="18" y="8" width="204" height="414" rx="32" fill="#2a2a2a"/>
+          <!-- Screen -->
+          <rect x="30" y="32" width="180" height="368" rx="14" fill="#111"/>
+          <!-- Status bar -->
+          <rect x="30" y="32" width="180" height="26" rx="14" fill="#1a1a1a"/>
+          <rect x="82" y="36" width="76" height="14" rx="7" fill="#2a2a2a"/>
+          <!-- Card 1 -->
+          <rect x="38" y="72" width="164" height="88" rx="10" fill="#222"/>
+          <rect x="38" y="72" width="164" height="52" rx="10" fill="#2d2d2d"/>
+          <rect x="46" y="80" width="148" height="36" rx="6" fill="#333"/>
+          <circle cx="56" cy="148" r="11" fill="#444"/>
+          <rect x="72" y="141" width="72" height="8" rx="4" fill="#444"/>
+          <rect x="72" y="153" width="48" height="6" rx="3" fill="#3a3a3a"/>
+          <circle cx="186" cy="148" r="8" fill="none" stroke="#555" stroke-width="1.8"/>
+          <!-- Card 2 — Scotia highlighted -->
+          <rect x="38" y="170" width="164" height="96" rx="10" fill="#1a0404"/>
+          <rect x="38" y="170" width="164" height="58" rx="10" fill="rgba(236,17,26,0.13)"/>
+          <rect x="38" y="170" width="5"   height="96" rx="2.5" fill="#ec111a"/>
+          <rect x="50" y="182" width="90" height="8" rx="4" fill="rgba(236,17,26,0.55)"/>
+          <rect x="50" y="194" width="128" height="6" rx="3" fill="rgba(255,255,255,0.18)"/>
+          <rect x="50" y="204" width="110" height="6" rx="3" fill="rgba(255,255,255,0.12)"/>
+          <rect x="50" y="214" width="80"  height="6" rx="3" fill="rgba(255,255,255,0.10)"/>
+          <!-- Dollar badge -->
+          <circle cx="178" cy="196" r="16" fill="rgba(236,17,26,0.25)"/>
+          <circle cx="178" cy="196" r="11" fill="rgba(236,17,26,0.5)"/>
+          <line x1="178" y1="187" x2="178" y2="205" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <path d="M183,191 Q188,191 188,195 Q188,199 178,200" stroke="white" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <path d="M173,200 Q168,201 168,205 Q168,209 173,210" stroke="white" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <!-- Scotia avatar -->
+          <circle cx="56" cy="248" r="11" fill="rgba(236,17,26,0.35)"/>
+          <rect x="72" y="241" width="64" height="8" rx="4" fill="rgba(236,17,26,0.45)"/>
+          <rect x="72" y="253" width="40" height="6" rx="3" fill="#3a3a3a"/>
+          <circle cx="186" cy="248" r="8" fill="#ec111a"/>
+          <!-- Card 3 -->
+          <rect x="38" y="276" width="164" height="88" rx="10" fill="#222"/>
+          <rect x="38" y="276" width="164" height="52" rx="10" fill="#2d2d2d"/>
+          <rect x="46" y="284" width="148" height="36" rx="6" fill="#333"/>
+          <circle cx="56" cy="350" r="11" fill="#444"/>
+          <rect x="72" y="343" width="76" height="8" rx="4" fill="#444"/>
+          <rect x="72" y="355" width="52" height="6" rx="3" fill="#3a3a3a"/>
+          <circle cx="186" cy="350" r="8" fill="none" stroke="#555" stroke-width="1.8"/>
+          <!-- Bottom home bar -->
+          <rect x="88" y="376" width="64" height="5" rx="2.5" fill="#333"/>
+          <!-- Side button -->
+          <rect x="218" y="130" width="4" height="55" rx="2" fill="#3a3a3a"/>
+        </svg>
+      </div>
+    </div>
+    <div class="case-note">Source: madeinca.ca/tiktok-statistics-canada/</div>
+    <div class="page-num">04 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       05 CREATOR PROGRAM
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-5">
+    <div class="slide-band">
+      <span class="band-title">Growth Channel</span>
+      <span class="band-section">Proposed Solution</span>
+    </div>
+    <div class="slide-content" style="justify-content:flex-start;padding-top:clamp(1rem,3vh,2rem);">
+      <h2 class="reveal">Creator Referral Program</h2>
+      <div class="two-col">
+        <div>
+          <div class="tag reveal">Independent Referrers</div>
+          <ul class="bullet-list">
+            <li class="reveal-l">NOT Scotiabank employees</li>
+            <li class="reveal-l">NOT financial advisors</li>
+            <li class="reveal-l">Affiliate-style — paid per qualified referral</li>
+            <li class="reveal-l">Content is creator-owned and organic</li>
+          </ul>
+        </div>
+        <div class="col-divider">
+          <h3 class="reveal" style="margin-bottom:clamp(0.5rem,1.4vh,1rem);">How It Works</h3>
+          <div class="steps-list">
+            <div class="step-item reveal">
+              <div class="step-num">01</div>
+              <div class="step-text"><strong>Creator Posts Content</strong>e.g., "How I started investing with $25"</div>
+            </div>
+            <div class="step-item reveal">
+              <div class="step-num">02</div>
+              <div class="step-text"><strong>Includes Referral Link</strong>Links directly to Scotia Launchpad</div>
+            </div>
+            <div class="step-item reveal">
+              <div class="step-num">03</div>
+              <div class="step-text"><strong>User Converts</strong>Scotia-owned onboarding page handles everything</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">05 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       06 WHY CREATOR WORKS
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-6">
+    <div class="slide-band">
+      <span class="band-title">Competitive Advantage</span>
+      <span class="band-section">Proposed Solution</span>
+    </div>
+    <div class="slide-content" style="justify-content:flex-start;padding-top:clamp(1rem,3vh,2rem);">
+      <h2 class="reveal">Why This Model Works</h2>
+      <ul class="bullet-list">
+        <li class="reveal"><strong>Matches how Gen Z already consumes financial content</strong> — no behavior change required</li>
+        <li class="reveal"><strong>More authentic than corporate ads</strong> — community trust over brand messaging</li>
+        <li class="reveal"><strong>Lower cost per acquisition</strong> — performance-based, pay only on conversion</li>
+        <li class="reveal"><strong>Higher engagement and trust</strong> — personal stories outperform product campaigns</li>
+      </ul>
+      <div class="takeaway reveal">Instead of competing with creators, Scotiabank integrates into existing user behavior.</div>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">06 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       07 LAUNCHPAD OVERVIEW — art layout
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-7">
+    <div class="slide-band">
+      <span class="band-title">The Product</span>
+      <span class="band-section">Proposed Solution</span>
+    </div>
+    <div class="slide-content art-slide-content">
+      <div class="art-col-left">
+        <h2 class="reveal">Scotia Launchpad</h2>
+        <div class="takeaway reveal">"We don't wait for users to decide to invest — we automate the decision at the moment income arrives."</div>
+        <ul class="bullet-list">
+          <li class="reveal">Low-friction investing system converting user interest into <strong>automated, recurring behavior</strong></li>
+          <li class="reveal">Connects to iTRADE — TFSA, RRSP, and non-registered accounts</li>
+          <li class="reveal">No prior investment knowledge required to get started</li>
+          <li class="reveal"><strong>Savings happen before spending</strong> — payday-triggered</li>
+        </ul>
+      </div>
+      <!-- Automation cycle illustration -->
+      <div class="art-col-right reveal-r">
+        <svg viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="190" cy="190" r="172" fill="#f5f6fc"/>
+          <circle cx="190" cy="190" r="142" stroke="#e2e8ee" stroke-width="2" stroke-dasharray="9 7"/>
+          <!-- Arc 1 — red (top, paycheck → bank) -->
+          <path d="M85,135 A125,125 0 0 1 295,135" stroke="#ec111a" stroke-width="9" stroke-linecap="round" fill="none"/>
+          <polygon points="290,122 303,138 281,143" fill="#ec111a"/>
+          <!-- Arc 2 — gray (right, bank → calendar) -->
+          <path d="M305,155 A125,125 0 0 1 190,328" stroke="#c8d0db" stroke-width="9" stroke-linecap="round" fill="none"/>
+          <polygon points="182,323 192,340 202,323" fill="#c8d0db"/>
+          <!-- Arc 3 — gray (bottom, calendar → paycheck) -->
+          <path d="M173,328 A125,125 0 0 1 75,155" stroke="#c8d0db" stroke-width="9" stroke-linecap="round" fill="none"/>
+          <polygon points="68,163 75,143 88,162" fill="#c8d0db"/>
+          <!-- Center -->
+          <circle cx="190" cy="190" r="58" fill="white" stroke="#ec111a" stroke-width="2.5"/>
+          <circle cx="190" cy="190" r="46" fill="rgba(236,17,26,0.05)"/>
+          <!-- Dollar sign -->
+          <line x1="190" y1="158" x2="190" y2="222" stroke="#ec111a" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M202,167 Q218,167 218,177 Q218,188 190,191" stroke="#ec111a" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M178,191 Q162,192 162,203 Q162,214 178,217" stroke="#ec111a" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <!-- Paycheck icon (top) -->
+          <rect x="156" y="38" width="68" height="46" rx="8" fill="white" stroke="#e2e8ee" stroke-width="1.5"/>
+          <rect x="163" y="48" width="54" height="7" rx="3.5" fill="#dde2eb"/>
+          <rect x="163" y="59" width="40" height="6" rx="3" fill="#dde2eb"/>
+          <rect x="163" y="69" width="30" height="6" rx="3" fill="rgba(236,17,26,0.4)"/>
+          <!-- Bank icon (bottom right) -->
+          <rect x="282" y="295" width="56" height="48" rx="8" fill="white" stroke="#e2e8ee" stroke-width="1.5"/>
+          <polygon points="310,303 295,313 325,313" fill="#dde2eb"/>
+          <rect x="292" y="315" width="9" height="20" rx="2" fill="#dde2eb"/>
+          <rect x="306" y="315" width="9" height="20" rx="2" fill="#dde2eb"/>
+          <rect x="320" y="315" width="9" height="20" rx="2" fill="rgba(236,17,26,0.4)"/>
+          <rect x="292" y="336" width="37" height="5" rx="2" fill="#dde2eb"/>
+          <!-- Calendar icon (bottom left) -->
+          <rect x="42" y="295" width="56" height="48" rx="8" fill="white" stroke="#e2e8ee" stroke-width="1.5"/>
+          <rect x="42" y="295" width="56" height="18" rx="8" fill="rgba(236,17,26,0.12)"/>
+          <rect x="42" y="305" width="56" height="8" fill="rgba(236,17,26,0.12)"/>
+          <circle cx="57"  cy="322" r="4" fill="#dde2eb"/>
+          <circle cx="70"  cy="322" r="4" fill="#dde2eb"/>
+          <circle cx="83"  cy="322" r="4" fill="#dde2eb"/>
+          <circle cx="57"  cy="334" r="4" fill="#dde2eb"/>
+          <circle cx="70"  cy="334" r="4" fill="rgba(236,17,26,0.5)"/>
+          <circle cx="83"  cy="334" r="4" fill="#dde2eb"/>
+        </svg>
+      </div>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">07 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       08 USER FLOW
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-8">
+    <div class="slide-band">
+      <span class="band-title">User Onboarding</span>
+      <span class="band-section">Product Workflow</span>
+    </div>
+    <div class="slide-content" style="justify-content:flex-start;padding-top:clamp(0.75rem,2.5vh,1.5rem);">
+      <h2 class="reveal">5-Step Onboarding Flow</h2>
+      <div class="steps-list">
+        <div class="step-item reveal">
+          <div class="step-num">01</div>
+          <div class="step-text"><strong>Click Creator Referral Link</strong>Arrives from creator's TikTok or social content</div>
+        </div>
+        <div class="step-item reveal">
+          <div class="step-num">02</div>
+          <div class="step-text"><strong>Select Contribution Amount</strong>Fixed dollar amount or percentage of income</div>
+        </div>
+        <div class="step-item reveal">
+          <div class="step-num">03</div>
+          <div class="step-text"><strong>Open or Link iTRADE Account</strong>TFSA, RRSP, or non-registered</div>
+        </div>
+        <div class="step-item reveal">
+          <div class="step-num">04</div>
+          <div class="step-text"><strong>Set Up Recurring Deposit</strong>Payday auto-invest activated</div>
+        </div>
+        <div class="step-item reveal">
+          <div class="step-num">05</div>
+          <div class="step-text"><strong>Begin Automated Investing</strong>No manual action required going forward</div>
+        </div>
+      </div>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">08 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       09 PAYDAY AUTO-INVEST
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-9">
+    <div class="slide-band">
+      <span class="band-title">Core Feature</span>
+      <span class="band-section">Product Workflow</span>
+    </div>
+    <div class="slide-content" style="justify-content:flex-start;padding-top:clamp(1rem,3vh,2rem);">
+      <h2 class="reveal">Payday Auto-Invest</h2>
+      <p class="reveal">Users commit to a recurring contribution — funds are automatically deposited into their iTRADE account on every payday.</p>
+      <div class="two-col" style="margin-top:clamp(0.7rem,2vh,1.4rem);">
+        <div>
+          <div class="tag reveal">Fixed Amount</div>
+          <ul class="bullet-list">
+            <li class="reveal-l"><strong>$10 per paycheck</strong></li>
+            <li class="reveal-l"><strong>$25 per paycheck</strong></li>
+            <li class="reveal-l"><strong>$50 per paycheck</strong></li>
+          </ul>
+        </div>
+        <div class="col-divider">
+          <div class="tag reveal">% of Income</div>
+          <ul class="bullet-list">
+            <li class="reveal-l"><strong>2% of paycheck</strong></li>
+            <li class="reveal-l"><strong>5% of paycheck</strong></li>
+            <li class="reveal-l"><strong>10% of paycheck</strong></li>
+          </ul>
+        </div>
+      </div>
+      <div class="takeaway reveal">Removes decision fatigue, timing hesitation, and knowledge barriers — investment is automatic.</div>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">09 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       10 TIERED INCENTIVES
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-10">
+    <div class="slide-band">
+      <span class="band-title">Incentive Structure</span>
+      <span class="band-section">Product Workflow</span>
+    </div>
+    <div class="slide-content" style="justify-content:flex-start;padding-top:clamp(1rem,3vh,2rem);">
+      <h2 class="reveal">Tiered Match Program</h2>
+      <table class="data-table reveal">
+        <thead>
+          <tr>
+            <th>Monthly Contribution</th><th>Match %</th><th>Max Bonus</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>$0 – $249</td><td>5%</td><td>Up to $50</td></tr>
+          <tr class="hl-row"><td>$250 – $499 ★ Target Tier</td><td>10%</td><td>Up to $100</td></tr>
+          <tr><td>$500 – $999</td><td>15%</td><td>Up to $200</td></tr>
+          <tr><td>$1,000+</td><td>25%</td><td>Up to $500</td></tr>
+        </tbody>
+      </table>
+      <div class="takeaway reveal" style="margin-top:clamp(0.6rem,1.8vh,1.2rem);">Design logic: low tier feels minimal → encourages upgrade. Mid tier feels optimal (target). High tier feels premium but capped.</div>
+    </div>
+    <div class="case-note">Anchoring + decoy pricing psychology — case competition concept</div>
+    <div class="page-num">10 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       11 RETENTION
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-11">
+    <div class="slide-band">
+      <span class="band-title">Retention Mechanism</span>
+      <span class="band-section">Product Workflow</span>
+    </div>
+    <div class="slide-content" style="justify-content:flex-start;padding-top:clamp(1rem,3vh,2rem);">
+      <h2 class="reveal">90-Day Vesting</h2>
+      <p class="reveal">To prevent gaming, bonuses unlock progressively — rewarding consistent behavior, not just sign-ups.</p>
+      <div class="stat-row reveal" style="margin-top:clamp(0.6rem,1.8vh,1.2rem);">
+        <div class="stat-card">
+          <div class="stat-value">90</div>
+          <div class="stat-label">Days before match bonuses fully unlock</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">3×</div>
+          <div class="stat-label">Consecutive monthly contributions required</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">Active</div>
+          <div class="stat-label">Account usage required throughout the period</div>
+        </div>
+      </div>
+      <div class="takeaway reveal">"We reward consistency, not sign-ups."</div>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">11 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       12 BUSINESS IMPACT — art layout
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-12">
+    <div class="slide-band">
+      <span class="band-title">Business Impact</span>
+      <span class="band-section">Impact Model</span>
+    </div>
+    <div class="slide-content art-slide-content">
+      <div class="art-col-left">
+        <h2 class="reveal">Why This Model Works</h2>
+        <div class="steps-list">
+          <div class="step-item reveal">
+            <div class="step-num">01</div>
+            <div class="step-text"><strong>Increases AUM</strong>Recurring deposits create compounding, long-term capital growth under Scotiabank management</div>
+          </div>
+          <div class="step-item reveal">
+            <div class="step-num">02</div>
+            <div class="step-text"><strong>Builds Primary Banking Relationship</strong>Users route income through Scotia and invest through Scotia — full ecosystem capture</div>
+          </div>
+          <div class="step-item reveal">
+            <div class="step-num">03</div>
+            <div class="step-text"><strong>Reduces Churn via Behavioral Lock-In</strong>Leaving requires stopping contributions, breaking habit, and withdrawing funds — high friction</div>
+          </div>
+        </div>
+      </div>
+      <!-- Bar growth chart illustration -->
+      <div class="art-col-right reveal-r">
+        <svg viewBox="0 0 380 340" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="8" y="8" width="364" height="314" rx="14" fill="#f5f6fc"/>
+          <!-- Horizontal grid lines -->
+          <line x1="48" y1="58"  x2="352" y2="58"  stroke="#e2e8ee" stroke-width="1"/>
+          <line x1="48" y1="108" x2="352" y2="108" stroke="#e2e8ee" stroke-width="1"/>
+          <line x1="48" y1="158" x2="352" y2="158" stroke="#e2e8ee" stroke-width="1"/>
+          <line x1="48" y1="208" x2="352" y2="208" stroke="#e2e8ee" stroke-width="1"/>
+          <line x1="48" y1="258" x2="352" y2="258" stroke="#e2e8ee" stroke-width="1"/>
+          <!-- Axes -->
+          <line x1="48" y1="258" x2="356" y2="258" stroke="#c8d0db" stroke-width="2" stroke-linecap="round"/>
+          <line x1="48" y1="48"  x2="48"  y2="262" stroke="#c8d0db" stroke-width="2" stroke-linecap="round"/>
+          <!-- Bars (5, increasing height) -->
+          <rect x="68"  y="228" width="38" height="30"  rx="5" fill="#dde2eb"/>
+          <rect x="122" y="208" width="38" height="50"  rx="5" fill="#cad1dc"/>
+          <rect x="176" y="178" width="38" height="80"  rx="5" fill="#b8c2d0"/>
+          <rect x="230" y="138" width="38" height="120" rx="5" fill="#9eaab9"/>
+          <rect x="284" y="75"  width="38" height="183" rx="5" fill="#ec111a"/>
+          <!-- Gloss on last bar -->
+          <rect x="284" y="75" width="38" height="38" rx="5" fill="rgba(255,255,255,0.18)"/>
+          <!-- Upward arrow -->
+          <line x1="303" y1="73" x2="303" y2="44" stroke="#ec111a" stroke-width="3.5" stroke-linecap="round"/>
+          <polygon points="294,55 303,34 312,55" fill="#ec111a"/>
+          <!-- Dot tops of bars 1–4 -->
+          <circle cx="87"  cy="226" r="5" fill="white" stroke="#cad1dc" stroke-width="1.8"/>
+          <circle cx="141" cy="206" r="5" fill="white" stroke="#b8c2d0" stroke-width="1.8"/>
+          <circle cx="195" cy="176" r="5" fill="white" stroke="#9eaab9" stroke-width="1.8"/>
+          <circle cx="249" cy="136" r="5" fill="white" stroke="#8898a9" stroke-width="1.8"/>
+          <circle cx="303" cy="73"  r="7" fill="white" stroke="#ec111a" stroke-width="2.5"/>
+          <!-- Trend line -->
+          <path d="M87,226 C108,212 128,208 141,206 C163,202 182,186 195,176 C218,163 237,142 249,136 C272,124 292,84 303,73" stroke="#ec111a" stroke-width="1.8" stroke-dasharray="6 4" fill="none" opacity="0.55"/>
+          <!-- Year labels (small rects) -->
+          <rect x="75"  y="264" width="24" height="6" rx="3" fill="#dde2eb"/>
+          <rect x="129" y="264" width="24" height="6" rx="3" fill="#dde2eb"/>
+          <rect x="183" y="264" width="24" height="6" rx="3" fill="#dde2eb"/>
+          <rect x="237" y="264" width="24" height="6" rx="3" fill="#dde2eb"/>
+          <rect x="291" y="264" width="24" height="6" rx="3" fill="rgba(236,17,26,0.3)"/>
+        </svg>
+      </div>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">12 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       13 KEY INSIGHT
+       ════════════════════════════════ -->
+  <section class="slide closing-slide" id="slide-13">
+    <svg class="deco-wave" viewBox="0 0 600 360" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line x1="0" y1="72"  x2="600" y2="72"  stroke="white" stroke-width="0.8" stroke-opacity="0.1"/>
+      <line x1="0" y1="144" x2="600" y2="144" stroke="white" stroke-width="0.8" stroke-opacity="0.1"/>
+      <line x1="0" y1="216" x2="600" y2="216" stroke="white" stroke-width="0.8" stroke-opacity="0.1"/>
+      <line x1="0" y1="288" x2="600" y2="288" stroke="white" stroke-width="0.8" stroke-opacity="0.1"/>
+      <path d="M0,320 C80,308 140,295 200,280 S310,238 390,205 S510,148 600,88" stroke="white" stroke-opacity="0.4" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M0,320 C80,308 140,295 200,280 S310,238 390,205 S510,148 600,88 L600,360 L0,360 Z" fill="white" fill-opacity="0.04"/>
+      <circle cx="200" cy="280" r="5" fill="white" fill-opacity="0.5"/>
+      <circle cx="390" cy="205" r="6" fill="white" fill-opacity="0.6"/>
+      <circle cx="600" cy="88"  r="11" fill="white" fill-opacity="0.8"/>
+      <circle cx="600" cy="88"  r="6"  fill="rgba(236,17,26,0.7)"/>
+    </svg>
+    <div class="slide-content">
+      <div class="big-quote reveal">We are not just<br><span>acquiring users</span> —<br>we are redirecting<br>where their <span>money flows.</span></div>
+    </div>
+    <div class="case-note">Key Insight</div>
+    <div class="page-num">13 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       14 MOMENTUM NUDGES
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-14">
+    <div class="slide-band">
+      <span class="band-title">App Feature — Momentum Nudges</span>
+      <span class="band-section">Product Workflow</span>
+    </div>
+    <div class="slide-content" style="justify-content:flex-start;padding-top:clamp(1rem,3vh,2rem);">
+      <h2 class="reveal">Behavior-Based Nudges</h2>
+      <p class="reveal">Instead of encouraging risky speculation, Launchpad uses behavior-anchored prompts that reinforce consistency:</p>
+      <div style="display:flex;flex-direction:column;gap:clamp(0.5rem,1.4vh,1rem);margin-top:clamp(0.6rem,1.8vh,1.2rem);">
+        <div class="nudge-card reveal">
+          <div class="nudge-label">Streak</div>
+          <div class="nudge-text">"You've invested 3 weeks in a row — keep your streak?"</div>
+        </div>
+        <div class="nudge-card reveal">
+          <div class="nudge-label">Goal Progress</div>
+          <div class="nudge-text">"You're $20 away from your monthly goal."</div>
+        </div>
+        <div class="nudge-card reveal">
+          <div class="nudge-label">Payday Trigger</div>
+          <div class="nudge-text">"Your paycheck just hit — add $10?"</div>
+        </div>
+      </div>
+      <div class="takeaway reveal">Mirrors subscription product engagement — avoids speculation, rewards consistency.</div>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">14 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       15 SMART UPSELL
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-15">
+    <div class="slide-band">
+      <span class="band-title">App Feature — Smart Upsell</span>
+      <span class="band-section">Product Workflow</span>
+    </div>
+    <div class="slide-content" style="justify-content:flex-start;padding-top:clamp(1rem,3vh,2rem);">
+      <h2 class="reveal">Smart Contribution Upsell</h2>
+      <div class="two-col">
+        <div>
+          <p class="reveal">When users see account progress, they're prompted to increase their contribution:</p>
+          <div style="display:flex;flex-direction:column;gap:clamp(0.5rem,1.4vh,0.9rem);margin-top:clamp(0.6rem,1.8vh,1.1rem);">
+            <div class="nudge-card reveal">
+              <div class="nudge-label">Progress Trigger</div>
+              <div class="nudge-text">"Your account grew by $120 this month."</div>
+            </div>
+            <div class="nudge-card reveal">
+              <div class="nudge-label">Upsell Prompt</div>
+              <div class="nudge-text">"Increase your contribution by $10?"</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-divider">
+          <h3 class="reveal" style="margin-bottom:clamp(0.5rem,1.4vh,1rem);">UI Design</h3>
+          <ul class="bullet-list">
+            <li class="reveal-l"><strong>Slider-based</strong> — minimal friction</li>
+            <li class="reveal-l"><strong>One-tap confirm</strong> — instant update</li>
+            <li class="reveal-l"><strong>Delayed re-prompt</strong> — no pressure if dismissed</li>
+          </ul>
+          <div class="takeaway reveal" style="margin-top:clamp(0.6rem,1.8vh,1.2rem);">Nudged repeatedly, never forced. Users compound contribution growth naturally.</div>
+        </div>
+      </div>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">15 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       16 BEHAVIORAL DESIGN
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-16">
+    <div class="slide-band">
+      <span class="band-title">Design Philosophy</span>
+      <span class="band-section">Product Architecture</span>
+    </div>
+    <div class="slide-content" style="justify-content:flex-start;padding-top:clamp(1rem,3vh,2rem);">
+      <h2 class="reveal">Behavioral Design Principles</h2>
+      <div class="principle-grid reveal">
+        <div class="principle-card">
+          <div class="p-icon">A</div>
+          <div class="p-title">Automation</div>
+          <div class="p-body">Removes decision-making friction at every touchpoint</div>
+        </div>
+        <div class="principle-card">
+          <div class="p-icon">R</div>
+          <div class="p-title">Recurring</div>
+          <div class="p-body">Subscription-like behavior creates durable habit loops</div>
+        </div>
+        <div class="principle-card">
+          <div class="p-icon">P</div>
+          <div class="p-title">Progress</div>
+          <div class="p-body">Goal-based tracking sustains long-term motivation</div>
+        </div>
+        <div class="principle-card">
+          <div class="p-icon">T</div>
+          <div class="p-title">Tiered</div>
+          <div class="p-body">Anchoring + decoy effect drives natural upgrades</div>
+        </div>
+        <div class="principle-card">
+          <div class="p-icon">N</div>
+          <div class="p-title">Nudging</div>
+          <div class="p-body">Engagement without coercion — choice preserved</div>
+        </div>
+      </div>
+      <p class="reveal" style="margin-top:clamp(0.6rem,1.8vh,1.2rem);font-size:var(--small-size);">Grounded in Thaler &amp; Benartzi's <em>Save More Tomorrow</em> — default-based saving significantly increases participation rates.</p>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">16 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       17 FINAL STATEMENT
+       ════════════════════════════════ -->
+  <section class="slide closing-slide" id="slide-17">
+    <svg class="deco-wave" viewBox="0 0 600 360" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line x1="0" y1="72"  x2="600" y2="72"  stroke="white" stroke-width="0.8" stroke-opacity="0.12"/>
+      <line x1="0" y1="144" x2="600" y2="144" stroke="white" stroke-width="0.8" stroke-opacity="0.12"/>
+      <line x1="0" y1="216" x2="600" y2="216" stroke="white" stroke-width="0.8" stroke-opacity="0.12"/>
+      <line x1="0" y1="288" x2="600" y2="288" stroke="white" stroke-width="0.8" stroke-opacity="0.12"/>
+      <path d="M0,320 C80,308 140,295 200,280 S310,238 390,205 S510,148 600,88" stroke="white" stroke-opacity="0.5" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M0,320 C80,308 140,295 200,280 S310,238 390,205 S510,148 600,88 L600,360 L0,360 Z" fill="white" fill-opacity="0.05"/>
+      <circle cx="390" cy="205" r="6.5" fill="white" fill-opacity="0.7"/>
+      <circle cx="600" cy="88"  r="12" fill="white" fill-opacity="0.9"/>
+      <circle cx="600" cy="88"  r="6"  fill="rgba(236,17,26,0.7)"/>
+    </svg>
+    <div class="slide-content">
+      <div class="big-quote reveal">Scotia Launchpad<br>transforms investing<br>from a <span>decision</span><br>into a <span>system.</span></div>
+      <p class="cq-sub reveal">By connecting income, automation, and behavioral design — Scotiabank captures not just the transaction, but the entire financial relationship.</p>
+    </div>
+    <div class="case-note">Case competition concept — synthetic data</div>
+    <div class="page-num">17 / 18</div>
+  </section>
+
+  <!-- ════════════════════════════════
+       18 SOURCES
+       ════════════════════════════════ -->
+  <section class="slide" id="slide-18">
+    <div class="slide-band">
+      <span class="band-title">Sources</span>
+      <span class="band-section">References</span>
+    </div>
+    <div class="slide-content" style="justify-content:flex-start;padding-top:clamp(1rem,3vh,2rem);">
+      <h2 class="reveal">References</h2>
+      <div class="reveal">
+        <div class="source-item">
+          <div class="source-title">TikTok Usage in Canada</div>
+          <div class="source-url">https://madeinca.ca/tiktok-statistics-canada/</div>
+          <div class="source-note">TikTok user demographics and platform reach in Canada (2024)</div>
+        </div>
+        <div class="source-item">
+          <div class="source-title">Canadian Income Data — Statistics Canada</div>
+          <div class="source-url">https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1110009101</div>
+          <div class="source-note">Average after-tax income by household in Canada</div>
+        </div>
+        <div class="source-item">
+          <div class="source-title">Behavioral Finance — Thaler &amp; Benartzi</div>
+          <div class="source-url">Save More Tomorrow (SMarT) Program</div>
+          <div class="source-note">Default-based saving increases participation; automation removes cognitive barriers to investing</div>
+        </div>
+        <div class="source-item">
+          <div class="source-title">Case Study Insights</div>
+          <div class="source-url">Scotiabank / Competition Provided Material</div>
+          <div class="source-note">82% of investors 18–24 use social media; significant reliance on non-traditional financial education</div>
+        </div>
+      </div>
+    </div>
+    <div class="case-note">Case competition concept</div>
+    <div class="page-num">18 / 18</div>
+  </section>
+
+  <script>
+    class SlidePresentation {
+      constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.totalSlides = this.slides.length;
+        this.currentIndex = 0;
+        this.progressBar = document.getElementById('progressBar');
+        this.navDotsContainer = document.getElementById('navDots');
+        this.setupNavDots();
+        this.setupIntersectionObserver();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        this.updateProgress(0);
+      }
+      setupNavDots() {
+        this.navDotsContainer.innerHTML = '';
+        this.slides.forEach((_, i) => {
+          const dot = document.createElement('button');
+          dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+          dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+          dot.addEventListener('click', () => this.goTo(i));
+          this.navDotsContainer.appendChild(dot);
+        });
+        this.dots = Array.from(this.navDotsContainer.querySelectorAll('.nav-dot'));
+      }
+      setupIntersectionObserver() {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              const idx = this.slides.indexOf(entry.target);
+              if (idx !== -1) { this.currentIndex = idx; this.updateProgress(idx); this.updateDots(idx); }
+            }
+          });
+        }, { threshold: 0.5 });
+        this.slides.forEach(slide => observer.observe(slide));
+      }
+      setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+          switch (e.key) {
+            case 'ArrowDown': case 'ArrowRight': case ' ':
+              e.preventDefault(); this.goTo(Math.min(this.currentIndex + 1, this.totalSlides - 1)); break;
+            case 'ArrowUp': case 'ArrowLeft':
+              e.preventDefault(); this.goTo(Math.max(this.currentIndex - 1, 0)); break;
+            case 'Home': e.preventDefault(); this.goTo(0); break;
+            case 'End':  e.preventDefault(); this.goTo(this.totalSlides - 1); break;
+          }
+        });
+      }
+      setupTouchNav() {
+        let startY = 0, startX = 0;
+        document.addEventListener('touchstart', e => { startY = e.touches[0].clientY; startX = e.touches[0].clientX; }, { passive: true });
+        document.addEventListener('touchend', e => {
+          const dy = startY - e.changedTouches[0].clientY, dx = startX - e.changedTouches[0].clientX;
+          if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) {
+            if (dy > 0) this.goTo(Math.min(this.currentIndex + 1, this.totalSlides - 1));
+            else this.goTo(Math.max(this.currentIndex - 1, 0));
+          }
+        });
+      }
+      setupWheelNav() {
+        let lastWheel = 0;
+        document.addEventListener('wheel', e => {
+          const now = Date.now(); if (now - lastWheel < 800) return; lastWheel = now;
+          if (e.deltaY > 30) this.goTo(Math.min(this.currentIndex + 1, this.totalSlides - 1));
+          else if (e.deltaY < -30) this.goTo(Math.max(this.currentIndex - 1, 0));
+        }, { passive: true });
+      }
+      goTo(index) {
+        if (index < 0 || index >= this.totalSlides) return;
+        this.slides[index].scrollIntoView({ behavior: 'smooth' });
+        this.currentIndex = index; this.updateProgress(index); this.updateDots(index);
+      }
+      updateProgress(index) {
+        this.progressBar.style.width = (this.totalSlides > 1 ? (index / (this.totalSlides - 1)) * 100 : 100) + '%';
+      }
+      updateDots(index) {
+        if (!this.dots) return;
+        this.dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+      }
+    }
+    new SlidePresentation();
+  </script>
+</body>
+</html>
