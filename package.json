@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
-    "@expo-google-fonts/poppins": "^0.4.1",
+    "@expo-google-fonts/inter": "^0.4.2",
     "expo": "~56.0.4",
     "expo-blur": "~56.0.3",
     "expo-font": "~56.0.5",

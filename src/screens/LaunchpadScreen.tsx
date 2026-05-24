@@ -1,7 +1,6 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ScotiaWordmark } from '../components/ScotiaLogo';
 import { colors, fonts, radius, shadow, space } from '../theme';
 
 const APP_BACKDROP = require('../../assets/reference/scotia-app-bg.jpg');
@@ -17,26 +16,35 @@ export function LaunchpadScreen({
 
   return (
     <View style={styles.root}>
+      {/* ── Blurred app backdrop ── */}
       <Image source={APP_BACKDROP} style={styles.backdrop} resizeMode="cover" />
-      <BlurView intensity={32} tint="light" style={StyleSheet.absoluteFill} />
+      <BlurView intensity={40} tint="light" style={StyleSheet.absoluteFill} />
       <View style={styles.scrim} pointerEvents="none" />
 
-      <View style={[styles.sheet, { paddingBottom: insets.bottom + space.lg }]}>
+      {/* ── Main content sheet ── */}
+      <View style={[styles.sheet, { paddingBottom: insets.bottom + space.sm }]}>
         <View style={styles.handle} />
 
-        <ScotiaWordmark height={22} />
-        <Text style={styles.eyebrow}>LAUNCHPAD · POWERED BY SCOTIA iTRADE</Text>
+        {/* Product heading — not the full Scotiabank wordmark */}
+        <Text style={styles.productName}>Launchpad</Text>
+        <Text style={styles.eyebrow}>by Scotia iTRADE</Text>
 
-        <View style={styles.creatorChip}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>M</Text>
-          </View>
-          <Text style={styles.creatorText}>Mikhai invited you</Text>
+        {/* Referral context — reframed as a Scotia-native pattern */}
+        <View style={styles.referralRow}>
+          <View style={styles.referralDot} />
+          <Text style={styles.referralText}>
+            Referred by Mikhai · Preferred Package member
+          </Text>
         </View>
 
         <Text style={styles.title}>Start your investing habit</Text>
 
-        <View style={styles.bonus}>
+        {/* Bonus block — $500 in charcoal, NOT red, so CTA stays the sole red element */}
+        <View
+          style={styles.bonus}
+          accessible
+          accessibilityLabel="Earn up to 500 dollars in matched investments"
+        >
           <Text style={styles.bonusKicker}>EARN UP TO</Text>
           <Text style={styles.bonusAmount}>$500</Text>
           <Text style={styles.bonusCaption}>in matched investments</Text>
@@ -51,13 +59,20 @@ export function LaunchpadScreen({
           <Text style={styles.ctaText}>Start my Launchpad</Text>
         </Pressable>
 
-        <Pressable onPress={onLearnMore} style={styles.link} accessibilityRole="link">
-          <Text style={styles.linkText}>See how the $500 bonus works</Text>
+        <Pressable
+          onPress={onLearnMore}
+          style={styles.link}
+          accessibilityRole="link"
+          accessibilityLabel="See how the 500 dollar bonus works"
+        >
+          <Text style={styles.linkText}>See how the $500 bonus works →</Text>
         </Pressable>
       </View>
     </View>
   );
 }
+
+// ─── Styles ─────────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   root: {
@@ -80,106 +95,109 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(26,25,25,0.08)',
+    backgroundColor: 'rgba(26,25,25,0.12)',
   },
 
-  // Sheet
+  // ── Sheet ──
   sheet: {
     backgroundColor: colors.white,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    paddingHorizontal: space.lg + 4,
-    paddingTop: space.sm,
+    borderTopLeftRadius: radius.lg,
+    borderTopRightRadius: radius.lg,
+    paddingHorizontal: 24,
+    paddingTop: space.xs,
     alignItems: 'center',
-    ...shadow.cta,
+    ...shadow.sheet,
   },
   handle: {
-    width: 40,
-    height: 5,
-    borderRadius: 3,
+    width: 36,
+    height: 4,
+    borderRadius: 2,
     backgroundColor: colors.gray300,
-    marginBottom: space.lg,
+    marginBottom: space.sm + 4,
+  },
+
+  // ── Product identity ──
+  productName: {
+    fontFamily: fonts.bold,
+    fontSize: 22,
+    color: colors.inkStrong,
+    letterSpacing: -0.3,
   },
   eyebrow: {
-    marginTop: 8,
-    fontFamily: fonts.semibold,
-    fontSize: 10.5,
-    letterSpacing: 1.4,
+    marginTop: 2,
+    fontFamily: fonts.medium,
+    fontSize: 12,
     color: colors.gray500,
   },
 
-  creatorChip: {
+  // ── Referral row (Scotia-native pattern, not a social chip) ──
+  referralRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginTop: space.sm,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     backgroundColor: colors.surface,
-    borderRadius: radius.pill,
-    paddingVertical: 6,
-    paddingLeft: 6,
-    paddingRight: 14,
-    marginTop: space.lg,
+    borderRadius: radius.sm,
   },
-  avatar: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: colors.inkStrong,
-    alignItems: 'center',
-    justifyContent: 'center',
+  referralDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.red,
   },
-  avatarText: {
-    color: colors.white,
-    fontFamily: fonts.bold,
-    fontSize: 12,
-  },
-  creatorText: {
-    fontFamily: fonts.semibold,
-    fontSize: 13.5,
+  referralText: {
+    fontFamily: fonts.regular,
+    fontSize: 13,
     color: colors.ink,
   },
 
+  // ── Title ──
   title: {
-    marginTop: space.md,
+    marginTop: space.sm,
     fontFamily: fonts.bold,
-    fontSize: 19,
+    fontSize: 20,
     color: colors.inkStrong,
     letterSpacing: -0.2,
     textAlign: 'center',
   },
 
+  // ── Bonus ──
   bonus: {
     alignItems: 'center',
-    marginTop: space.md,
+    marginTop: space.sm,
   },
   bonusKicker: {
     fontFamily: fonts.semibold,
     fontSize: 10,
     color: colors.gray500,
-    letterSpacing: 1.8,
+    letterSpacing: 1.6,
   },
   bonusAmount: {
     fontFamily: fonts.extrabold,
-    fontSize: 38,
-    lineHeight: 44,
-    color: colors.red,
-    letterSpacing: -0.6,
-    marginTop: 3,
+    fontSize: 42,
+    lineHeight: 48,
+    color: colors.inkStrong, // Charcoal, NOT red — CTA is the sole red element
+    letterSpacing: -0.8,
+    marginTop: 2,
   },
   bonusCaption: {
     fontFamily: fonts.medium,
-    fontSize: 13.5,
+    fontSize: 13,
     color: colors.gray600,
     marginTop: 2,
   },
 
+  // ── CTA ──
   cta: {
     alignSelf: 'stretch',
-    height: 56,
+    height: 52,
     borderRadius: radius.pill,
     backgroundColor: colors.red,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: space.lg,
+    marginTop: 20,
   },
   ctaPressed: {
     backgroundColor: colors.redHover,
@@ -188,15 +206,17 @@ const styles = StyleSheet.create({
   ctaText: {
     color: colors.white,
     fontFamily: fonts.bold,
-    fontSize: 15.5,
+    fontSize: 15,
   },
+
+  // ── Link ──
   link: {
-    paddingVertical: 12,
+    paddingVertical: 10,
     marginTop: 2,
   },
   linkText: {
     fontFamily: fonts.semibold,
-    fontSize: 13.5,
+    fontSize: 13,
     color: colors.linkBlue,
   },
 });

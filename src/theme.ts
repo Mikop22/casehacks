@@ -32,52 +32,55 @@ export const colors = {
   redWashBorder: '#F7C9CB',
 } as const;
 
-// Geometric sans approximating Scotia's Sharp Sans-based typeface.
+// Inter closely matches Scotia's grotesque Sharp Sans–derived typeface.
+// Avoid Poppins — its geometric roundness reads as startup, not Big Five bank.
 export const fonts = {
-  regular: 'Poppins_400Regular',
-  medium: 'Poppins_500Medium',
-  semibold: 'Poppins_600SemiBold',
-  bold: 'Poppins_700Bold',
-  extrabold: 'Poppins_800ExtraBold',
+  regular: 'Inter_400Regular',
+  medium: 'Inter_500Medium',
+  semibold: 'Inter_600SemiBold',
+  bold: 'Inter_700Bold',
+  extrabold: 'Inter_800ExtraBold',
 } as const;
 
-// 7.5px base increments from the design language
+// 7.5px base increments from the Scotia design language
 export const space = {
-  xs: 8,
-  sm: 12,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 44,
+  xs: 8,    // ~1×
+  sm: 15,   // 2×
+  md: 30,   // 4×
+  lg: 45,   // 6×
+  xl: 90,   // 12×
 } as const;
 
+// Scotia uses tight, utilitarian radii — 4–6px on cards, 5px rect buttons.
+// Pill (999) only for marketing CTAs.
 export const radius = {
-  sm: 10,
-  md: 16,
-  lg: 22,
+  sm: 4,
+  md: 8,
+  lg: 12,
   pill: 999,
 } as const;
 
+// Subtle, neutral shadows only. No colored glows or dramatic offsets.
 export const shadow = {
   card: {
-    shadowColor: '#1A1919',
+    shadowColor: '#000000',
     shadowOpacity: 0.06,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   },
-  hero: {
-    shadowColor: colors.redDark,
-    shadowOpacity: 0.28,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 14 },
-    elevation: 10,
+  elevated: {
+    shadowColor: '#000000',
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
   },
-  cta: {
-    shadowColor: '#1A1919',
+  sheet: {
+    shadowColor: '#000000',
     shadowOpacity: 0.12,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: -6 },
-    elevation: 12,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: -4 },
+    elevation: 10,
   },
 } as const;
