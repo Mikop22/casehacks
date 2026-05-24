@@ -115,8 +115,6 @@ export function ActivateScreen({
 
             {/* Confirmation summary */}
             <View style={styles.confirm}>
-              <Text style={styles.confirmEyebrow}>READY TO ACTIVATE</Text>
-
               <View style={styles.divider} />
 
               <View style={styles.row}>
@@ -339,13 +337,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     padding: 16,
     ...shadow.card,
-  },
-  confirmEyebrow: {
-    fontFamily: fonts.semibold,
-    fontSize: 10,
-    letterSpacing: 1.4,
-    color: colors.gray500,
-    textAlign: 'center',
   },
   divider: {
     width: '100%',
