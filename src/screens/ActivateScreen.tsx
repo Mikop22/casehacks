@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts, radius, shadow } from '../theme';
 
@@ -38,124 +38,107 @@ export function ActivateScreen({
 
   return (
     <View style={styles.root}>
-      <View style={styles.layer}>
-        <View style={{ height: insets.top + 30 }} />
+      <View style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]}>
+        {/* Handle */}
+        <View style={styles.handle} />
 
-        <View style={styles.sheet}>
-          {/* Handle pill */}
-          <View style={styles.handle} />
-
-          {/* Back button */}
-          <View style={styles.topBar}>
-            <Pressable
-              onPress={onBack}
-              hitSlop={12}
-              style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.45 }]}
-              accessibilityRole="button"
-              accessibilityLabel="Go back"
-            >
-              <Text style={styles.backArrow}>‹</Text>
-              <Text style={styles.backLabel}>Back</Text>
-            </Pressable>
-          </View>
-
-          <ScrollView
-            style={styles.scroll}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
+        {/* Back */}
+        <View style={styles.topBar}>
+          <Pressable
+            onPress={onBack}
+            hitSlop={12}
+            style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.45 }]}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
           >
-            <Text style={styles.headline}>Choose where it goes</Text>
-            <Text style={styles.sub}>
-              We'll deposit {pct}% of each paycheque into your selected Scotia{' '}iTRADE account.
-            </Text>
+            <Text style={styles.backArrow}>‹</Text>
+            <Text style={styles.backLabel}>Back</Text>
+          </Pressable>
+        </View>
 
-            {/* Account dropdown */}
-            <Text style={styles.sectionLabel}>Deposit into</Text>
-            <View style={styles.dropdown}>
-              {/* Selected row — always visible */}
-              <Pressable
-                onPress={() => setOpen((o) => !o)}
-                style={({ pressed }) => [styles.dropdownSelected, pressed && { opacity: 0.7 }]}
-                accessibilityRole="button"
-                accessibilityLabel={`Selected account: ${selectedAccount.label} ending in ${selectedAccount.last4}. Tap to change.`}
-                accessibilityState={{ expanded: open }}
-              >
-                <View style={styles.accountInfo}>
-                  <Text style={styles.accountLabel}>{selectedAccount.label}</Text>
-                  <Text style={styles.accountMask}>•••• {selectedAccount.last4}</Text>
-                </View>
-                <Text style={[styles.chevron, open && styles.chevronOpen]}>›</Text>
-              </Pressable>
+        <Text style={styles.headline}>Choose where it goes</Text>
+        <Text style={styles.sub}>
+          We'll deposit {pct}% of each paycheque into your selected Scotia iTRADE account.
+        </Text>
 
-              {/* Options — visible when open */}
-              {open && (
-                <View style={styles.dropdownOptions}>
-                  <View style={styles.optionDivider} />
-                  {ACCOUNTS.filter((a) => a.id !== selected).map((acct, i, arr) => (
-                    <View key={acct.id}>
-                      <Pressable
-                        onPress={() => { setSelected(acct.id); setOpen(false); }}
-                        style={({ pressed }) => [styles.option, pressed && { backgroundColor: colors.surface }]}
-                        accessibilityRole="menuitem"
-                        accessibilityLabel={`${acct.label} ending in ${acct.last4}`}
-                      >
-                        <Text style={styles.optionLabel}>{acct.label}</Text>
-                        <Text style={styles.optionMask}>•••• {acct.last4}</Text>
-                      </Pressable>
-                      {i < arr.length - 1 && <View style={styles.optionDivider} />}
-                    </View>
-                  ))}
-                </View>
-              )}
+        {/* Dropdown */}
+        <Text style={styles.sectionLabel}>Deposit into</Text>
+        <View style={styles.dropdown}>
+          <Pressable
+            onPress={() => setOpen((o) => !o)}
+            style={({ pressed }) => [styles.dropdownSelected, pressed && { opacity: 0.7 }]}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: open }}
+          >
+            <View style={styles.accountInfo}>
+              <Text style={styles.accountLabel}>{selectedAccount.label}</Text>
+              <Text style={styles.accountMask}>•••• {selectedAccount.last4}</Text>
             </View>
+            <Text style={[styles.chevron, open && styles.chevronOpen]}>›</Text>
+          </Pressable>
 
-            {/* Confirmation summary */}
-            <View style={styles.confirm}>
-              <View style={styles.divider} />
-              <View style={styles.row}>
-                <Text style={styles.rowLabel}>Amount</Text>
-                <Text style={styles.rowValue}>{pct}% per paycheque</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.rowLabel}>Deposit</Text>
-                <Text style={styles.rowValue}>{money(deposit)} every 2 weeks</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.rowLabel}>Destination</Text>
-                <Text style={styles.rowValue}>
-                  iTRADE {selectedAccount.label} ···· {selectedAccount.last4}
-                </Text>
-              </View>
-              <View style={styles.divider} />
-              <View style={styles.row}>
-                <Text style={styles.rowLabel}>Bonus estimate</Text>
-                <Text style={styles.rowValueBonus}>+{money(bonusEstimate)}</Text>
-              </View>
+          {open && (
+            <View>
+              <View style={styles.optionDivider} />
+              {ACCOUNTS.filter((a) => a.id !== selected).map((acct, i, arr) => (
+                <View key={acct.id}>
+                  <Pressable
+                    onPress={() => { setSelected(acct.id); setOpen(false); }}
+                    style={({ pressed }) => [styles.option, pressed && { backgroundColor: colors.surface }]}
+                  >
+                    <Text style={styles.optionLabel}>{acct.label}</Text>
+                    <Text style={styles.optionMask}>•••• {acct.last4}</Text>
+                  </Pressable>
+                  {i < arr.length - 1 && <View style={styles.optionDivider} />}
+                </View>
+              ))}
             </View>
-          </ScrollView>
+          )}
+        </View>
 
-          <View style={[styles.footer, { paddingBottom: insets.bottom + 2 }]}>
-            <Pressable
-              onPress={() => onActivate?.(selected)}
-              style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
-              accessibilityRole="button"
-              accessibilityLabel="Activate Launchpad"
-            >
-              <Text style={styles.ctaText}>Activate Launchpad</Text>
-            </Pressable>
-            <Text style={styles.helper}>You can change this later.</Text>
+        {/* Summary */}
+        <View style={styles.confirm}>
+          <View style={styles.divider} />
+          <View style={styles.row}>
+            <Text style={styles.rowLabel}>Amount</Text>
+            <Text style={styles.rowValue}>{pct}% per paycheque</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.rowLabel}>Deposit</Text>
+            <Text style={styles.rowValue}>{money(deposit)} every 2 weeks</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.rowLabel}>Destination</Text>
+            <Text style={styles.rowValue}>iTRADE {selectedAccount.label} ···· {selectedAccount.last4}</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.row}>
+            <Text style={styles.rowLabel}>Bonus estimate</Text>
+            <Text style={styles.rowValueBonus}>+{money(bonusEstimate)}</Text>
           </View>
         </View>
+
+        {/* CTA */}
+        <Pressable
+          onPress={() => onActivate?.(selected)}
+          style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
+          accessibilityRole="button"
+          accessibilityLabel="Activate Launchpad"
+        >
+          <Text style={styles.ctaText}>Activate Launchpad</Text>
+        </Pressable>
+        <Text style={styles.helper}>You can change this later.</Text>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
-  layer: { flex: 1 },
-  sheet: {
+  root: {
     flex: 1,
+    justifyContent: 'flex-end',
+  },
+  sheet: {
     backgroundColor: colors.white,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
@@ -164,7 +147,6 @@ const styles = StyleSheet.create({
     ...shadow.sheet,
   },
 
-  // ── Top bar ──
   handle: {
     alignSelf: 'center',
     width: 40,
@@ -176,7 +158,7 @@ const styles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 12,
   },
   backBtn: {
     flexDirection: 'row',
@@ -196,15 +178,6 @@ const styles = StyleSheet.create({
     color: colors.linkBlue,
   },
 
-  // ── Scroll ──
-  scroll: { flex: 1 },
-  scrollContent: {
-    flexGrow: 1,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-
-  // ── Header ──
   headline: {
     fontFamily: fonts.bold,
     fontSize: 19,
@@ -222,7 +195,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
 
-  // ── Dropdown ──
   sectionLabel: {
     marginTop: 16,
     marginBottom: 8,
@@ -266,7 +238,6 @@ const styles = StyleSheet.create({
   chevronOpen: {
     transform: [{ rotate: '-90deg' }],
   },
-  dropdownOptions: {},
   optionDivider: {
     height: 1,
     backgroundColor: colors.border,
@@ -288,18 +259,17 @@ const styles = StyleSheet.create({
     color: colors.gray500,
   },
 
-  // ── Confirmation ──
   confirm: {
-    marginTop: 16,
+    marginTop: 14,
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: radius.sm,
-    padding: 14,
+    paddingHorizontal: 14,
+    paddingBottom: 4,
     ...shadow.card,
   },
   divider: {
-    width: '100%',
     height: 1,
     backgroundColor: colors.border,
     marginVertical: 10,
@@ -307,7 +277,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
     paddingVertical: 3,
   },
   rowLabel: {
@@ -326,14 +295,13 @@ const styles = StyleSheet.create({
     color: colors.red,
   },
 
-  // ── Footer ──
-  footer: { paddingTop: 12 },
   cta: {
     height: 56,
     borderRadius: radius.sm,
     backgroundColor: colors.red,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 20,
   },
   ctaPressed: {
     backgroundColor: colors.redHover,
