@@ -98,7 +98,6 @@ export function ActivateScreen({
 
         {/* Summary */}
         <View style={styles.confirm}>
-          <View style={styles.divider} />
           <View style={styles.row}>
             <Text style={styles.rowLabel}>Amount</Text>
             <Text style={styles.rowValue}>{pct}% per paycheque</Text>
